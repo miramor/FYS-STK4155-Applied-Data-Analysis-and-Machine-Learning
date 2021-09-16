@@ -50,9 +50,11 @@ def FrankeFunction(x,y):
 
 
 
-def evaluate_method(method, scale):
-    #X_train, X_test, z_train, z_test = train_test_split(X,z,test_size=0.2)
-    global X_train, X_test, z_train, z_test
+def evaluate_method(method, train_test_l, scale, d):
+    X_train, X_test, z_train, z_test = train_test_l
+    l = int((d+1)*(d+2)/2)
+    X_train = X_train[:,:l]
+    X_test = X_test[:,:l]
 
     if scale: #scala data
         scaler = StandardScaler()
@@ -62,16 +64,16 @@ def evaluate_method(method, scale):
         X_test = scaler.transform(X_test)
         scaler2 = StandardScaler()
         #scaler2 = MaxAbsScaler()
-        scaler2.fit(z_train)#.reshape(-1,1))
-        z_train = scaler2.transform(z_train)#.reshape(-1,1))
-        z_test = scaler2.transform(z_test)#.reshape(-1,1))
+        scaler2.fit(z_train.reshape(-1,1))
+        z_train = scaler2.transform(z_train.reshape(-1,1))
+        z_test = scaler2.transform(z_test.reshape(-1,1))
         # scaler2.fit(z_train)
         # z_train = scaler2.transform(z_train)
         # z_test = scaler2.transform(z_test)
 
 
     beta = method(X_train,z_train)
-    print(beta.shape)
+    #print(beta.shape)
     z_tilde = predict(X_train, beta)
     z_predict = predict(X_test, beta)
 
@@ -83,6 +85,17 @@ def evaluate_method(method, scale):
 
     return mse_tilde, r2_tilde, mse_predict, r2_predict
 
+def bootstrap(X,z):
+    n = len(z)
+    data = np.random.randint(0,n,n)
+    X_new = X[data] #random chosen columns for new design matrix
+    z_new = z[data]
+    return X_new, z_new
+
+
+
+
+
 N = 1000
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
@@ -93,57 +106,101 @@ y = np.random.uniform(0, 1, N)
 #x1, y1 = np.meshgrid(x,y)
 z = FrankeFunction(x, y)
 #z = FrankeFunction(x, y)
-X = create_X(x,y,5)
+complex = 15 #complexity of model
+X = create_X(x,y,complex)
 
-X_train, X_test, z_train, z_test = train_test_split(X,z,test_size=0.2)
-
-
+test_train_l = train_test_split(X,z,test_size=0.2)
+#Exercise 1
 print(z.shape)
-print(f"OLS: {evaluate_method(ols, scale = False)}")
+print(f"OLS: {evaluate_method(ols, test_train_l, scale = False, d = 5)}")
 
 noise = np.random.normal(0, 1, size=(z.shape))
-z_noisy = FrankeFunction(x, y) + noise*0.1
-print(f"OLS with noise: {evaluate_method(ols, scale = False)}")
+z_noisy = FrankeFunction(x, y) + noise*0.2
+test_train_l_noise = train_test_split(X,z_noisy,test_size=0.2)
+print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = False, d = 5)}")
 
-# Task 2
-complex = 15 #complexity of model
-mse_test = np.zeros(complex)
-mse_train = np.zeros(complex)
-r2_test = np.zeros(complex)
-r2_train = np.zeros(complex)
+#Exercise 2
+n_bs = 300 #number of bootstrap cycles
+mse_test = np.zeros((complex, n_bs)) #for storing bootstrap samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
+mse_train = np.zeros((complex, n_bs))
+r2_test = np.zeros((complex, n_bs))
+r2_train = np.zeros((complex, n_bs))
 
+#Bootstrap and plotting MSE vs complexity
+for j in range(n_bs): #looping through bootstrap samples
+    X_sample, z_sample = bootstrap(X,z_noisy)
+    tts = train_test_split(X_sample,z_sample,test_size=0.2)
+    for i in range(complex): #looping through complexity of model
+        mse_train[i,j], r2_train[i,j], mse_test[i,j], r2_test[i,j] = evaluate_method(ols, tts, scale = True, d = i+1)
 
-
-for i in range(complex):
-    mse_train[i], r2_train[i], mse_test[i], r2_test[i] = evaluate_method(ols, scale = False)
+mean_mse_train = np.mean(mse_train, axis = 1) #calculating mean of MSE of all bootstrap samples
+mean_mse_test = np.mean(mse_test, axis = 1)
+mean_r2_train = np.mean(r2_train, axis = 1)
+mean_r2_test = np.mean(r2_test, axis = 1)
 
 labelsize=18
-plt.plot(range(complex), mse_train, label="MSE train")
-plt.plot(range(complex), mse_test, label="MSE test")
-plt.legend()
+plt.plot(range(1,complex+1), mean_mse_train, label="MSE train")
+plt.plot(range(1,complex+1), mean_mse_test, label="MSE test")
+plt.legend(fontsize=labelsize)
 plt.ylabel("MSE", fontsize=labelsize)
 plt.xlabel("Complexity", fontsize=labelsize)
 plt.title("Mean Squared Error", fontsize=labelsize)
 plt.savefig("MSE_complex.png")
 plt.show()
-
-
-
-
-
-
-
-
-
-
 """
-bootstraps = 10
-mse_tilde = np.zeros(bootstraps)
-r2_tilde = np.zeros(bootstraps)
-mse_predict = np.zerosn(bootstraps)
-r2_predict = np.zeros(bootstraps)
+#Bootstrap and plot MSE vs # datapoints
+n_points = np.arange(100,10001,100)
+
+mse_test_n = np.zeros((len(n_points), n_bs)) #for storing bootstrap samples' MSE for varying sample size (rows:sample size, columns:bootstrap sample)
+mse_train_n = np.zeros((len(n_points), n_bs))
+r2_test_n = np.zeros((len(n_points), n_bs))
+r2_train_n = np.zeros((len(n_points), n_bs))
 
 
-for i in range(bootstraps):
-    mse_tilde[i], r2_tilde[i], mse_predict[i], r2_predict[i] = evaluate_method(ols,X,z)
+for i in range(len(n_points)): #looping through different sample sizes
+    X_data = X[:n_points[i]]
+    z_data = z_noisy[:n_points[i]]
+    X_sample, z_sample = bootstrap(X_data,z_data)
+    tts = train_test_split(X_sample,z_sample,test_size=0.2)
+    for j in range(n_bs): #looping through different bootstrap cycles
+        mse_train_n[i,j], r2_train_n[i,j], mse_test_n[i,j], r2_test_n[i,j] = evaluate_method(ols, tts, scale = False, d = 4)
+
+
+mean_mse_train_n = np.mean(mse_train_n, axis = 1) #calculating mean of MSE of all bootstrap samples
+mean_mse_test_n = np.mean(mse_test_n, axis = 1)
+mean_r2_train_n = np.mean(r2_train_n, axis = 1)
+mean_r2_test_n = np.mean(r2_test_n, axis = 1)
+
+print(mean_mse_test_n)
+labelsize=18
+plt.plot(n_points, mean_mse_train_n, label="MSE train")
+plt.plot(n_points, mean_mse_test_n, label="MSE test")
+plt.legend(fontsize=labelsize)
+plt.ylabel("MSE", fontsize=labelsize)
+plt.xlabel("# Datapoints", fontsize=labelsize)
+plt.title("Mean Squared Error", fontsize=labelsize)
+plt.savefig("MSE_datapoints.png")
+plt.show()
 """
+
+#Exercise 3, K-fold
+
+def kfold(X,z,k):
+    #Exercise 2
+    mse_test = np.zeros((complex, k)) #for storing bootstrap samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
+    mse_train = np.zeros((complex, k))
+    r2_test = np.zeros((complex, k))
+    r2_train = np.zeros((complex, k))
+
+    n = len(X)
+    split = int(n/k)
+    for j in range(k): #looping through bootstrap samples
+        X_test = X[j*split:(j+1)*split]
+        X_train = X[-j*split:(j+1)*split]
+        for i in range(complex): #looping through complexity of model
+            mse_train[i,j], r2_train[i,j], mse_test[i,j], r2_test[i,j] = evaluate_method(ols, tts, scale = True, d = i+1)
+
+    mean_mse_train = np.mean(mse_train, axis = 1) #calculating mean of MSE of all bootstrap samples
+    mean_mse_test = np.mean(mse_test, axis = 1)
+    mean_r2_train = np.mean(r2_train, axis = 1)
+    mean_r2_test = np.mean(r2_test, axis = 1)
