@@ -195,8 +195,12 @@ def kfold(X,z,k):
     n = len(X)
     split = int(n/k)
     for j in range(k): #looping through bootstrap samples
-        X_test = X[j*split:(j+1)*split]
-        X_train = X[-j*split:(j+1)*split]
+        if j == k-1:
+            X_test = X[j*split:]
+            X_train = X[:j*split]
+        else:
+            X_test = X[j*split:(j+1)*split]
+            X_train = np.concatenate(X[:(j)*split], X[(j+1)*split:])
         for i in range(complex): #looping through complexity of model
             mse_train[i,j], r2_train[i,j], mse_test[i,j], r2_test[i,j] = evaluate_method(ols, tts, scale = True, d = i+1)
 
