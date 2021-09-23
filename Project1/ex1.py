@@ -41,12 +41,15 @@ def ols(X, z):
     return np.linalg.pinv(X.T @ X) @ X.T @ z
 
 def ridge(X, z, lmb):
-    return np.linalg.pinv(X.T @ X + lmb*np.identity(n)) @ X.T @ z
+    return np.linalg.pinv(X.T @ X + lmb*np.identity(X.shape[1])) @ X.T @ z
 
 def lasso(X, z, lmb):
-    reg = Lasso(alpha=lmb, fit_intercept=True)
+    reg = Lasso(alpha=lmb, fit_intercept=False)
     reg.fit(X, z)
-    return np.array(reg.coef_)
+    return reg.coef_
+
+def var_beta(X):
+        return np.diag(X.T @ X)
 
 def predict(X, beta):
     return X @ beta
@@ -58,7 +61,7 @@ def FrankeFunction(x,y):
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
 
-def kfold(X,z,k, plot = False):
+def kfold(X,z,k, plot = False): # X = X_train, z = z_train
     #Exercise 2
     mse_test = np.zeros((complex, k)) #for storing kfold samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
     mse_train = np.zeros((complex, k))
@@ -88,11 +91,15 @@ def kfold(X,z,k, plot = False):
     if plot:
         plot_mse(mean_mse_train, mean_mse_test, method_header = "k-fold")
 
-def evaluate_method(method, train_test_l, d, scale = True, lmb = False):
+def evaluate_method(method, train_test_l, d, scale = True, lmb = False, first_col = True, return_beta = False):
+
     X_train, X_test, z_train, z_test = train_test_l
     l = int((d+1)*(d+2)/2)
     X_train = X_train[:,:l]
     X_test = X_test[:,:l]
+    if first_col == False:
+        X_train = X_train[:,1:]
+        X_test = X_test[:,1:]
 
     if scale: #scala data
         scaler = StandardScaler()
@@ -122,8 +129,10 @@ def evaluate_method(method, train_test_l, d, scale = True, lmb = False):
 
     r2_tilde = r2(z_train, z_tilde)
     r2_predict = r2(z_test, z_predict)
-
-    return mse_tilde, r2_tilde, mse_predict, r2_predict
+    if return_beta == False:
+        return mse_tilde, r2_tilde, mse_predict, r2_predict
+    else:
+        return mse_tilde, r2_tilde, mse_predict, r2_predict, beta
 
 def bootstrap(X,z):
     n = len(z)
@@ -140,6 +149,7 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
         n_lmd = len(lambdas)
         for i in range(degree):
             plt.plot(lambdas, mse_test[i], label = f'Complexity: {complexities[i]}')
+            plt.xlabel("$ \lambda $", fontsize=labelsize)
 
     else:
         if plot_complexity:
@@ -157,7 +167,15 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
     plt.legend()
     plt.show()
 
-
+def ci(beta, var, n, z=1.96):
+    print(beta)
+    print(var)
+    ci1 = beta - z*var/np.sqrt(n)
+    ci2 = beta + z*var/np.sqrt(n)
+    ci_final = []
+    for i in range(len(ci1)):
+        ci_final.append([ci1[i],ci2[i]])
+    return ci_final
 
 N = 1000
 x = np.random.uniform(0, 1, N)
@@ -174,13 +192,19 @@ X = create_X(x,y,complex)
 
 test_train_l = train_test_split(X,z,test_size=0.2)
 #Exercise 1
-
 print(f"OLS: {evaluate_method(ols, test_train_l, scale = False, d = 5)}")
 
 noise = np.random.normal(0, 1, size=(z.shape))
 z_noisy = FrankeFunction(x, y) + noise*0.2
 test_train_l_noise = train_test_split(X,z_noisy,test_size=0.2)
 print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = False, d = 5)}")
+variance_beta = var_beta(test_train_l_noise[0])
+beta_l = ols(test_train_l_noise[0], test_train_l_noise[2])
+#print(variance_beta)
+confidence_interval = ci(beta_l, variance_beta, N)
+print(confidence_interval)
+
+
 
 #Exercise 2
 n_bs = 100 #number of bootstrap cycles
@@ -192,6 +216,7 @@ r2_train = np.zeros((complex, n_bs))
 #Bootstrap and plotting MSE vs complexity
 
 tts = train_test_split(X,z_noisy,test_size=0.2)
+beta_l = np.zeros(X.shape(1))
 for j in range(n_bs): #looping through bootstrap samples
     X_sample, z_sample = bootstrap(tts[0],tts[2])
     tts2 = [X_sample, tts[1], z_sample, tts[3]]
@@ -205,6 +230,7 @@ mean_r2_test = np.mean(r2_test, axis = 1)
 
 plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
 
+"""
 
 #Bootstrap and plot MSE vs # datapoints
 n_points = np.arange(100,10001,100)
@@ -230,14 +256,14 @@ mean_r2_train_n = np.mean(r2_train_n, axis = 1)
 mean_r2_test_n = np.mean(r2_test_n, axis = 1)
 
 plot_mse(mean_mse_train_n, mean_mse_test_n, method_header = "bootstrap", plot_complexity = False)
-
+"""
 
 
 #Exercise 3, K-fold
 kfold(X, z_noisy, 5, plot = True)
 
-nlambdas = 10
-lambdas_values = [0.001,0.005,0.01,0.05,0.1,0.5]#np.logspace(-4,1,nlambdas)
+nlambdas = 15
+lambdas_values = np.logspace(-4,0.5,nlambdas) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
 print(lambdas_values)
 compl = [2,3,4,5,6,7,8]
 mse_test_lasso = np.zeros((len(compl), len(lambdas_values)))
@@ -248,6 +274,8 @@ r2_train_lasso = np.zeros((len(compl), len(lambdas_values)))
 
 for i in range(len(compl)):
     for j in range(len(lambdas_values)):
-        mse_train_lasso[i,j], mse_test_lasso[i,j], r2_train_lasso[i,j], r2_test_lasso[i,j] = evaluate_method(lasso, tts, lmb = lambdas_values[j], d=compl[i])
+        mse_train_lasso[i,j], r2_train_lasso[i,j], mse_test_lasso[i,j], r2_test_lasso[i,j] = evaluate_method(lasso,
+        tts, lmb = lambdas_values[j], d=compl[i], scale = False)
+
 print(np.min(mse_test_lasso))
 plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambdas_values, complexities = compl)
