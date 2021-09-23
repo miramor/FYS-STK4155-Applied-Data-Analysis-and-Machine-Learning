@@ -245,6 +245,7 @@ mse_train_lasso = np.zeros((len(compl), len(lambdas_values)))
 r2_test_lasso = np.zeros((len(compl), len(lambdas_values)))
 r2_train_lasso = np.zeros((len(compl), len(lambdas_values)))
 
+
 for i in range(len(compl)):
     for j in range(len(lambdas_values)):
         mse_train_lasso[i,j], mse_test_lasso[i,j], r2_train_lasso[i,j], r2_test_lasso[i,j] = evaluate_method(lasso, tts, lmb = lambdas_values[j], d=compl[i])
