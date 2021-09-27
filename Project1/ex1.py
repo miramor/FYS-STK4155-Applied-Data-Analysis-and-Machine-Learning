@@ -10,7 +10,10 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.linear_model import Lasso
 from sklearn import linear_model
 import random
+plt.rcParams['figure.figsize'] = (10.,10.)
+
 np.random.seed(2405)
+
 def mse(z, z_model):
     n = len(z)
     mean_se = np.sum((z-z_model)**2)
@@ -48,7 +51,7 @@ def lasso(X, z, lmb):
     reg.fit(X, z)
     return reg.coef_
 
-def var_beta(X):
+def var_beta(X): #taking in X = X_train 
         return np.diag(X.T @ X)
 
 def predict(X, beta):
@@ -167,9 +170,8 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
     plt.legend()
     plt.show()
 
+
 def ci(beta, var, n, z=1.96):
-    print(beta)
-    print(var)
     ci1 = beta - z*var/np.sqrt(n)
     ci2 = beta + z*var/np.sqrt(n)
     ci_final = []
@@ -184,7 +186,7 @@ y = np.random.uniform(0, 1, N)
 #x = np.arange(0, 1, 0.001)
 #y = np.arange(0, 1, 0.001)
 
-#x1, y1 = np.meshgrid(x,y)
+#x1, y1 = np(x,y)
 z = FrankeFunction(x, y)
 #z = FrankeFunction(x, y)
 complex = 15 #complexity of model
@@ -200,9 +202,8 @@ test_train_l_noise = train_test_split(X,z_noisy,test_size=0.2)
 print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = False, d = 5)}")
 variance_beta = var_beta(test_train_l_noise[0])
 beta_l = ols(test_train_l_noise[0], test_train_l_noise[2])
-#print(variance_beta)
 confidence_interval = ci(beta_l, variance_beta, N)
-print(confidence_interval)
+
 
 
 
@@ -216,7 +217,7 @@ r2_train = np.zeros((complex, n_bs))
 #Bootstrap and plotting MSE vs complexity
 
 tts = train_test_split(X,z_noisy,test_size=0.2)
-beta_l = np.zeros(X.shape(1))
+beta_l = np.zeros(X.shape[1])
 for j in range(n_bs): #looping through bootstrap samples
     X_sample, z_sample = bootstrap(tts[0],tts[2])
     tts2 = [X_sample, tts[1], z_sample, tts[3]]
@@ -228,7 +229,7 @@ mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
 
-plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
+#plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
 
 """
 
@@ -264,7 +265,6 @@ kfold(X, z_noisy, 5, plot = True)
 
 nlambdas = 15
 lambdas_values = np.logspace(-4,0.5,nlambdas) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
-print(lambdas_values)
 compl = [2,3,4,5,6,7,8]
 mse_test_lasso = np.zeros((len(compl), len(lambdas_values)))
 mse_train_lasso = np.zeros((len(compl), len(lambdas_values)))
@@ -277,5 +277,29 @@ for i in range(len(compl)):
         mse_train_lasso[i,j], r2_train_lasso[i,j], mse_test_lasso[i,j], r2_test_lasso[i,j] = evaluate_method(lasso,
         tts, lmb = lambdas_values[j], d=compl[i], scale = False)
 
-print(np.min(mse_test_lasso))
-plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambdas_values, complexities = compl)
+#plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambdas_values, complexities = compl)
+
+
+from imageio import imread
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+
+# Load the terrain
+terrain1 = imread('SRTM_data_Norway_1.tif')
+x, y = np.meshgrid(range(terrain1.shape[1]), range(terrain1.shape[0]))
+X = create_X(x.flatten(),y.flatten(), 5)
+train_test_terrain = train_test_split(X, terrain1.flatten(), test_size = 0.2)
+print(f"OLS terrain: {evaluate_method(ols, train_test_terrain, scale = True, d = 5)}")
+
+
+print(x.shape)
+print(y.shape)
+print(terrain1)
+print(terrain1.shape)
+# Show the terrain
+plt.figure()
+plt.title('Terrain over Norway 1')
+plt.imshow(terrain1, cmap='gray')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.show()
