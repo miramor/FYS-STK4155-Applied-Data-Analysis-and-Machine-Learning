@@ -181,7 +181,7 @@ terrain1 = imread('SRTM_data_Norway_1.tif')
 z = (terrain1.flatten()).astype(float)
 N = len(z)
 x, y = np.meshgrid(range(terrain1.shape[1]), range(terrain1.shape[0])) #all possible (x,y) coordinates
-complex = 3 #complexity of model
+complex = 6 #complexity of model
 X = create_X(x.flatten(),y.flatten(), complex) #design matrix
 tts = train_test_split(X,z, test_size = 0.2)
 print(f"OLS terrain: {evaluate_method(ols, tts, scale = True, d = 5)}")
@@ -194,7 +194,7 @@ confidence_interval = ci(beta_l, variance_beta, N)
 
 
 #Exercise 2
-n_bs = 100 #number of bootstrap cycles
+n_bs = 5 #number of bootstrap cycles
 mse_test = np.zeros((complex, n_bs)) #for storing bootstrap samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
 mse_train = np.zeros((complex, n_bs))
 r2_test = np.zeros((complex, n_bs))
@@ -205,8 +205,8 @@ print("Starting bootstrap")
 for j in range(n_bs): #looping through bootstrap samples
     X_sample, z_sample = bootstrap(tts[0],tts[2]) #using the same X_train and z_train data for each bootstrap
     tts2 = [X_sample, tts[1], z_sample, tts[3]]
-    if j % 10 == 0:
-        print(f"We are at bootstrap nr. {j}")
+    if j % 1 == 0:
+        print(f"We are at bootstrap nr. {j+1}")
     for i in range(complex): #looping through complexity of model
         mse_train[i,j], r2_train[i,j], mse_test[i,j], r2_test[i,j] = evaluate_method(ols, tts2, scale = True, d = i+1)
 
@@ -215,8 +215,8 @@ mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
 
-plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
-
+plot_mse(mean_mse_train, mean_mse_test, method_header = "Bootstrap")
+del mean_mse_train, mean_mse_test, mean_r2_train, mean_r2_test
 
 #Exercise 3, K-fold
 print("Starting kfold")
@@ -238,7 +238,7 @@ for i in range(len(compl)):
         tts, lmb = lambdas_values[j], d=compl[i], scale = True)
 
 plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambdas_values, complexities = compl)
-
+del mse_test_lasso, mse_train_lasso, r2_test_lasso, r2_train_lasso
 
 
 """
