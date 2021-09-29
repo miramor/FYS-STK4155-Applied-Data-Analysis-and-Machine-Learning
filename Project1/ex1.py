@@ -51,7 +51,7 @@ def lasso(X, z, lmb):
     reg.fit(X, z)
     return reg.coef_
 
-def var_beta(X): #taking in X = X_train 
+def var_beta(X): #taking in X = X_train
         return np.diag(X.T @ X)
 
 def predict(X, beta):
@@ -93,6 +93,8 @@ def kfold(X,z,k, plot = False): # X = X_train, z = z_train
     mean_r2_test = np.mean(r2_test, axis = 1)
     if plot:
         plot_mse(mean_mse_train, mean_mse_test, method_header = "k-fold")
+
+    return mean_mse_train, mean_r2_train, mean_mse_test, mean_r2_test
 
 def evaluate_method(method, train_test_l, d, scale = True, lmb = False, first_col = True, return_beta = False):
 
@@ -156,9 +158,14 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
 
     else:
         if plot_complexity:
-            plt.plot(range(1,degree+1), mse_train, label="MSE train")
-            plt.plot(range(1,degree+1), mse_test, label="MSE test")
-            plt.xlabel("Complexity", fontsize=labelsize)
+            if method_header == "kfold":
+                for i in range(len(complexities)):
+                    plt.plot(range(1,degree+1), mse_test[:,i], label=f"k = {complexities[i]}")
+                plt.xlabel("Complexity", fontsize=labelsize)
+            else:
+                plt.plot(range(1,degree+1), mse_train, label="MSE train")
+                plt.plot(range(1,degree+1), mse_test, label="MSE test")
+                plt.xlabel("Complexity", fontsize=labelsize)
         else:
             plt.plot(n_points, mse_train, label="MSE train")
             plt.plot(n_points, mse_test, label="MSE test")
@@ -218,6 +225,7 @@ r2_train = np.zeros((complex, n_bs))
 
 tts = train_test_split(X,z_noisy,test_size=0.2)
 beta_l = np.zeros(X.shape[1])
+
 for j in range(n_bs): #looping through bootstrap samples
     X_sample, z_sample = bootstrap(tts[0],tts[2])
     tts2 = [X_sample, tts[1], z_sample, tts[3]]
@@ -228,9 +236,8 @@ mean_mse_train = np.mean(mse_train, axis = 1) #calculating mean of MSE of all bo
 mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
-
+"""
 #plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
-
 """
 
 #Bootstrap and plot MSE vs # datapoints
@@ -257,27 +264,63 @@ mean_r2_train_n = np.mean(r2_train_n, axis = 1)
 mean_r2_test_n = np.mean(r2_test_n, axis = 1)
 
 plot_mse(mean_mse_train_n, mean_mse_test_n, method_header = "bootstrap", plot_complexity = False)
-"""
+
 
 
 #Exercise 3, K-fold
-kfold(X, z_noisy, 5, plot = True)
+k = np.arange(5,11)
+mse_train_kfold = np.zeros((complex, len(k)))
+mse_test_kfold = np.zeros((complex, len(k)))
+r2_train_kfold = np.zeros((complex, len(k)))
+r2_test_kfold = np.zeros((complex, len(k)))
 
-nlambdas = 15
-lambdas_values = np.logspace(-4,0.5,nlambdas) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
+for i in range(len(k)):
+    mse_train_kfold[:,i], r2_train_kfold[:,i], mse_test_kfold[:,i], r2_test_kfold[:,i] = kfold(X, z_noisy, k[i])
+
+plot_mse(mse_train_kfold, mse_test_kfold, method_header = "kfold", complexities = k)
+"""
+#Exercise 4, Ridge
+nlambda = 15
+lambda_values = np.logspace(-4,0.5,nlambda) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
+mse_test_ridge = np.zeros((len(compl), len(lambda_values)))
+mse_train_ridge = np.zeros((len(compl), len(lambda_values)))
+r2_test_ridge = np.zeros((len(compl), len(lambda_values)))
+r2_train_ridge = np.zeros((len(compl), len(lambda_values)))
+
+for j in range(n_bs): #looping through bootstrap samples
+    X_sample, z_sample = bootstrap(tts[0],tts[2])
+    tts2 = [X_sample, tts[1], z_sample, tts[3]]
+    for i in range(complex): #looping through complexity of model
+        mse_train_ridge[i,j], r2_train_ridge[i,j], mse_test_ridge[i,j], r2_test_ridge[i,j] = evaluate_method(ridge, tts2, scale = True, d = i+1)
+
+mean_mse_train = np.mean(mse_train, axis = 1) #calculating mean of MSE of all bootstrap samples
+mean_mse_test = np.mean(mse_test, axis = 1)
+mean_r2_train = np.mean(r2_train, axis = 1)
+mean_r2_test = np.mean(r2_test, axis = 1)
+"""
+
+
+
+
+
+
+
+#Exercise 5, Lasso
+nlambda = 15
+lambda_values = np.logspace(-4,0.5,nlambda) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
 compl = [2,3,4,5,6,7,8]
-mse_test_lasso = np.zeros((len(compl), len(lambdas_values)))
-mse_train_lasso = np.zeros((len(compl), len(lambdas_values)))
-r2_test_lasso = np.zeros((len(compl), len(lambdas_values)))
-r2_train_lasso = np.zeros((len(compl), len(lambdas_values)))
+mse_test_lasso = np.zeros((len(compl), len(lambda_values)))
+mse_train_lasso = np.zeros((len(compl), len(lambda_values)))
+r2_test_lasso = np.zeros((len(compl), len(lambda_values)))
+r2_train_lasso = np.zeros((len(compl), len(lambda_values)))
 
 
 for i in range(len(compl)):
-    for j in range(len(lambdas_values)):
+    for j in range(len(lambda_values)):
         mse_train_lasso[i,j], r2_train_lasso[i,j], mse_test_lasso[i,j], r2_test_lasso[i,j] = evaluate_method(lasso,
-        tts, lmb = lambdas_values[j], d=compl[i], scale = False)
+        tts, lmb = lambda_values[j], d=compl[i], scale = False)
 
-#plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambdas_values, complexities = compl)
+#plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambda_values, complexities = compl)
 
 
 from imageio import imread
