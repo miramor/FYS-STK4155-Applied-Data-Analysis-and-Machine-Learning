@@ -201,6 +201,7 @@ r2_test = np.zeros((complex, n_bs))
 r2_train = np.zeros((complex, n_bs))
 
 #Bootstrap and plotting MSE vs complexity
+"""
 print("Starting bootstrap")
 for j in range(n_bs): #looping through bootstrap samples
     X_sample, z_sample = bootstrap(tts[0],tts[2]) #using the same X_train and z_train data for each bootstrap
@@ -221,7 +222,7 @@ del mean_mse_train, mean_mse_test, mean_r2_train, mean_r2_test
 #Exercise 3, K-fold
 print("Starting kfold")
 kfold(X, z, 5, plot = True)
-
+"""
 nlambdas = 15
 lambdas_values = np.logspace(-4,0.5, nlambdas) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
 compl = [2,3,4,5,6,7,8]
@@ -235,7 +236,7 @@ for i in range(len(compl)):
     print(f"We are at complexity: {compl[i]}")
     for j in range(len(lambdas_values)):
         mse_train_lasso[i,j], r2_train_lasso[i,j], mse_test_lasso[i,j], r2_test_lasso[i,j] = evaluate_method(lasso,
-        tts, lmb = lambdas_values[j], d=compl[i], scale = True)
+        tts, lmb = lambdas_values[j], d=compl[i], scale = False)
 
 plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambdas_values, complexities = compl)
 del mse_test_lasso, mse_train_lasso, r2_test_lasso, r2_train_lasso
