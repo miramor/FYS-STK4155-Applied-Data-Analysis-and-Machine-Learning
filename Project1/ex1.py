@@ -51,7 +51,7 @@ def lasso(X, z, lmb):
     reg.fit(X, z)
     return reg.coef_
 
-def var_beta(X): #taking in X = X_train 
+def var_beta(X): #taking in X = X_train
         return np.diag(X.T @ X)
 
 def predict(X, beta):
@@ -179,7 +179,7 @@ def ci(beta, var, n, z=1.96):
         ci_final.append([ci1[i],ci2[i]])
     return ci_final
 
-N = 1000
+N = 10000
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
 # Make data.
@@ -197,12 +197,13 @@ test_train_l = train_test_split(X,z,test_size=0.2)
 print(f"OLS: {evaluate_method(ols, test_train_l, scale = False, d = 5)}")
 
 noise = np.random.normal(0, 1, size=(z.shape))
-z_noisy = FrankeFunction(x, y) + noise*0.2
+z_noisy = FrankeFunction(x, y) + noise*0.1
 test_train_l_noise = train_test_split(X,z_noisy,test_size=0.2)
 print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = False, d = 5)}")
 variance_beta = var_beta(test_train_l_noise[0])
 beta_l = ols(test_train_l_noise[0], test_train_l_noise[2])
 confidence_interval = ci(beta_l, variance_beta, N)
+print(confidence_interval)
 
 
 
