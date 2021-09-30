@@ -148,6 +148,7 @@ def bootstrap(X,z):
 
 def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, lambdas = False, complexities = False):
     labelsize=18
+    ticksize = 15
     degree = mse_train.shape[0]
 
     if type(lambdas) != type(False):
@@ -171,6 +172,8 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
             plt.plot(n_points, mse_test, label="MSE test")
             plt.xlabel("# Datapoints", fontsize=labelsize)
     plt.legend(fontsize=labelsize)
+    plt.xticks(fontsize=ticksize)
+    #plt.yticks(fonsize=ticksize)
     plt.ylabel("MSE", fontsize=labelsize)
     plt.title(f"Mean Squared Error {method_header}", fontsize=labelsize)
     plt.savefig(f"MSE_datapoints_{method_header}.png")
@@ -277,7 +280,7 @@ r2_test_kfold = np.zeros((complex, len(k)))
 for i in range(len(k)):
     mse_train_kfold[:,i], r2_train_kfold[:,i], mse_test_kfold[:,i], r2_test_kfold[:,i] = kfold(X, z_noisy, k[i])
 
-plot_mse(mse_train_kfold, mse_test_kfold, method_header = "kfold", complexities = k)
+#plot_mse(mse_train_kfold, mse_test_kfold, method_header = "kfold", complexities = k)
 """
 #Exercise 4, Ridge
 nlambda = 15
@@ -328,6 +331,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
 # Load the terrain
+"""
 terrain1 = imread('SRTM_data_Norway_1.tif')
 x, y = np.meshgrid(range(terrain1.shape[1]), range(terrain1.shape[0]))
 X = create_X(x.flatten(),y.flatten(), 5)
@@ -346,3 +350,4 @@ plt.imshow(terrain1, cmap='gray')
 plt.xlabel('X')
 plt.ylabel('Y')
 plt.show()
+"""
