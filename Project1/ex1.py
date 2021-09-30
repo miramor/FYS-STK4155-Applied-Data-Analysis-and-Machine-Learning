@@ -186,7 +186,7 @@ def ci(beta, var, n, z=1.96):
         ci_final.append([ci1[i],ci2[i]])
     return ci_final
 
-N = 1000
+N = 500
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
 # Make data.
@@ -196,7 +196,7 @@ y = np.random.uniform(0, 1, N)
 #x1, y1 = np(x,y)
 z = FrankeFunction(x, y)
 #z = FrankeFunction(x, y)
-complex = 15 #complexity of model
+complex = 13 #complexity of model
 X = create_X(x,y,complex)
 
 test_train_l = train_test_split(X,z,test_size=0.2)
@@ -236,9 +236,9 @@ mean_mse_train = np.mean(mse_train, axis = 1) #calculating mean of MSE of all bo
 mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
-"""
-#plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
-"""
+
+plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
+
 
 #Bootstrap and plot MSE vs # datapoints
 n_points = np.arange(100,10001,100)
@@ -278,27 +278,32 @@ for i in range(len(k)):
     mse_train_kfold[:,i], r2_train_kfold[:,i], mse_test_kfold[:,i], r2_test_kfold[:,i] = kfold(X, z_noisy, k[i])
 
 plot_mse(mse_train_kfold, mse_test_kfold, method_header = "kfold", complexities = k)
-"""
+
 #Exercise 4, Ridge
+compl = [3,4,5,6]
 nlambda = 15
 lambda_values = np.logspace(-4,0.5,nlambda) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
 mse_test_ridge = np.zeros((len(compl), len(lambda_values)))
 mse_train_ridge = np.zeros((len(compl), len(lambda_values)))
 r2_test_ridge = np.zeros((len(compl), len(lambda_values)))
 r2_train_ridge = np.zeros((len(compl), len(lambda_values)))
-
+"""
 for j in range(n_bs): #looping through bootstrap samples
     X_sample, z_sample = bootstrap(tts[0],tts[2])
     tts2 = [X_sample, tts[1], z_sample, tts[3]]
     for i in range(complex): #looping through complexity of model
-        mse_train_ridge[i,j], r2_train_ridge[i,j], mse_test_ridge[i,j], r2_test_ridge[i,j] = evaluate_method(ridge, tts2, scale = True, d = i+1)
-
-mean_mse_train = np.mean(mse_train, axis = 1) #calculating mean of MSE of all bootstrap samples
-mean_mse_test = np.mean(mse_test, axis = 1)
-mean_r2_train = np.mean(r2_train, axis = 1)
-mean_r2_test = np.mean(r2_test, axis = 1)
 """
+for i in range(len(compl)):
+    for j in range(len(lambda_values)):
+        mse_train_ridge[i,j], r2_train_ridge[i,j], mse_test_ridge[i,j], r2_test_ridge[i,j] = evaluate_method(ridge,
+        tts, lmb = lambda_values[j], d=compl[i], scale = True)
 
+#mean_mse_train_ridge = np.mean(mse_train_ridge, axis = 1)
+#mean_mse_test_ridge = np.mean(mse_test_ridge, axis = 1)
+#mean_r2_train_ridge = np.mean(r2_train_ridge, axis = 1)
+#mean_r2_test_ridge = np.mean(r2_test_ridge, axis = 1)
+
+plot_mse(mse_train_ridge, mse_test_ridge, method_header = "ridge", lambdas = lambda_values, plot_complexity = True, complexities = compl)
 
 
 
@@ -307,18 +312,25 @@ mean_r2_test = np.mean(r2_test, axis = 1)
 
 #Exercise 5, Lasso
 nlambda = 15
-lambda_values = np.logspace(-4,0.5,nlambda) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
-compl = [2,3,4,5,6,7,8]
+lambda_values = np.logspace(-2,0.5,nlambda) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
 mse_test_lasso = np.zeros((len(compl), len(lambda_values)))
 mse_train_lasso = np.zeros((len(compl), len(lambda_values)))
 r2_test_lasso = np.zeros((len(compl), len(lambda_values)))
 r2_train_lasso = np.zeros((len(compl), len(lambda_values)))
+beta_lasso = lasso(tts[0], tts[2], 1)
+z_predict = predict(beta)
 
 
+
+"""
 for i in range(len(compl)):
     for j in range(len(lambda_values)):
         mse_train_lasso[i,j], r2_train_lasso[i,j], mse_test_lasso[i,j], r2_test_lasso[i,j] = evaluate_method(lasso,
         tts, lmb = lambda_values[j], d=compl[i], scale = False)
+
+print(mse_test_lasso)
+"""
+
 
 #plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambda_values, complexities = compl)
 
@@ -330,8 +342,9 @@ from matplotlib import cm
 # Load the terrain
 terrain1 = imread('SRTM_data_Norway_1.tif')
 x, y = np.meshgrid(range(terrain1.shape[1]), range(terrain1.shape[0]))
+z_terrain = terrain1.flatten().astype(np.float)
 X = create_X(x.flatten(),y.flatten(), 5)
-train_test_terrain = train_test_split(X, terrain1.flatten(), test_size = 0.2)
+train_test_terrain = train_test_split(X, z_terrain, test_size = 0.2)
 print(f"OLS terrain: {evaluate_method(ols, train_test_terrain, scale = True, d = 5)}")
 
 
