@@ -20,9 +20,10 @@ z_noisy = FrankeFunction(x, y) + noise*0.2
 
 tts = train_test_split(X,z_noisy,test_size=0.2) #Train test split
 
-compl = [3,4,5,6]
-nlambda = 15
-lambda_values = np.logspace(-4,0.5,nlambda) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
+compl = [3,4,5,6,7,8]
+nlambda = 100
+lambda_values = np.logspace(-6,-2,nlambda)
+print(lambda_values)
 mse_test_ridge = np.zeros((len(compl), len(lambda_values)))
 mse_train_ridge = np.zeros((len(compl), len(lambda_values)))
 r2_test_ridge = np.zeros((len(compl), len(lambda_values)))
