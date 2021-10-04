@@ -1,0 +1,25 @@
+# Latex files
+*.aux
+*.synctex.gz
+*.out
+*.log
+*.idx
+*.bbl
+*.blg
+
+# Data files
+*.txt
+*.PNG
+*.csv
+*.PDF
+
+# cpp executables
+*.exe
+*.o
+*.pdf
+
+# Mac directory file
+.DS_Store
+
+
+
