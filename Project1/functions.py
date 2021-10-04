@@ -170,6 +170,16 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
             plt.plot(n_points, mse_train, label="MSE train")
             plt.plot(n_points, mse_test, label="MSE test")
             plt.xlabel("# Datapoints", fontsize=labelsize)
+            plt.legend(fontsize=labelsize)
+            plt.xticks(fontsize=ticksize)
+            plt.yticks(fontsize=ticksize)
+            #plt.yticks(fonsize=ticksize)
+            plt.ylabel("MSE", fontsize=labelsize)
+            plt.title(f"Mean Squared Error {method_header}", fontsize=labelsize)
+            plt.grid()
+            plt.savefig(f"MSE_bootstrapDatapoints.png")
+            plt.show()
+            return
     plt.legend(fontsize=labelsize)
     plt.xticks(fontsize=ticksize)
     plt.yticks(fontsize=ticksize)
@@ -177,7 +187,7 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
     plt.ylabel("MSE", fontsize=labelsize)
     plt.title(f"Mean Squared Error {method_header}", fontsize=labelsize)
     plt.grid()
-    plt.savefig(f"MSE_datapoints_{method_header}.png")
+    plt.savefig(f"MSE_{method_header}.png")
     plt.show()
 
 

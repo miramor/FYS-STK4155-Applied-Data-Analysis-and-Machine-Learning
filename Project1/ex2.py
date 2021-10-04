@@ -16,7 +16,7 @@ z = FrankeFunction(x, y)
 complex = 13 #complexity of model
 X = create_X(x,y,complex)
 noise = np.random.normal(0, 1, size=(z.shape))
-z_noisy = FrankeFunction(x, y) + noise*0.2
+z_noisy = FrankeFunction(x, y) + noise
 
 tts = train_test_split(X,z_noisy,test_size=0.2) #Train test split
 
