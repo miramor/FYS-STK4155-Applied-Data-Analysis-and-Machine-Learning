@@ -4,7 +4,7 @@ import random
 import importlib
 import functions
 importlib.reload(functions)
-from functions import mse, r2, create_X, ols, ridge, lasso, kfold, var_beta, predict, FrankeFunction, evaluate_method, bootstrap, plot_mse, ci
+from functions import *
 
 np.random.seed(2405)
 

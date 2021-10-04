@@ -2,11 +2,11 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import random
 from imageio import imread
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import importlib
 import functions
 importlib.reload(functions)
-from functions import mse, r2, create_X, ols, ridge, lasso, kfold, var_beta, predict, FrankeFunction, evaluate_method, bootstrap, plot_mse, ci
+from functions import *
 
 np.random.seed(2405)
 

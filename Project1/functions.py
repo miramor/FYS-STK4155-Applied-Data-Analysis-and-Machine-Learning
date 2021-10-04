@@ -145,8 +145,8 @@ def bootstrap(X,z):
     return X_new, z_new
 
 def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, lambdas = False, complexities = False):
-    labelsize=18
-    ticksize = 15
+    labelsize=21
+    ticksize = 19
     degree = mse_train.shape[0]
 
     if type(lambdas) != type(False):
@@ -176,8 +176,8 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
     #plt.yticks(fonsize=ticksize)
     plt.ylabel("MSE", fontsize=labelsize)
     plt.title(f"Mean Squared Error {method_header}", fontsize=labelsize)
+    plt.grid()
     plt.savefig(f"MSE_datapoints_{method_header}.png")
-    plt.legend()
     plt.show()
 
 
