@@ -186,7 +186,7 @@ def ci(beta, var, n, z=1.96):
         ci_final.append([ci1[i],ci2[i]])
     return ci_final
 
-N = 10000
+N = 500
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
 # Make data.
@@ -202,15 +202,26 @@ X = create_X(x,y,complex)
 test_train_l = train_test_split(X,z,test_size=0.2)
 #Exercise 1
 print(f"OLS: {evaluate_method(ols, test_train_l, scale = False, d = 5)}")
+print(f"OLS: {evaluate_method(ols, test_train_l, scale = True, d = 5)}")
 
 noise = np.random.normal(0, 1, size=(z.shape))
 z_noisy = FrankeFunction(x, y) + noise*0.1
 test_train_l_noise = train_test_split(X,z_noisy,test_size=0.2)
 print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = False, d = 5)}")
+print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = True, d = 5)}")
 variance_beta = var_beta(test_train_l_noise[0])
 beta_l = ols(test_train_l_noise[0], test_train_l_noise[2])
 confidence_interval = ci(beta_l, variance_beta, N)
 print(confidence_interval)
+
+beta_sd_l = variance_beta*(1.96/np.sqrt(N))
+print(beta_l)
+print(beta_sd_l)
+print(np.log(beta_l))
+plt.errorbar(range(len(beta_l)), np.log(abs(beta_l)), np.log(beta_sd_l), linestyle='None', marker = 'o', ecolor = 'red')
+plt.title(r"The logarithmic absolute values to {\beta} and the logarithmic standard deviation")
+plt.grid()
+plt.show()
 
 
 
@@ -237,9 +248,9 @@ mean_mse_train = np.mean(mse_train, axis = 1) #calculating mean of MSE of all bo
 mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
-"""
-#plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
-"""
+
+plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
+
 
 #Bootstrap and plot MSE vs # datapoints
 n_points = np.arange(100,10001,100)
@@ -331,9 +342,13 @@ from matplotlib import cm
 # Load the terrain
 terrain1 = imread('SRTM_data_Norway_1.tif')
 x, y = np.meshgrid(range(terrain1.shape[1]), range(terrain1.shape[0]))
-X = create_X(x.flatten(),y.flatten(), 5)
-train_test_terrain = train_test_split(X, terrain1.flatten(), test_size = 0.2)
-print(f"OLS terrain: {evaluate_method(ols, train_test_terrain, scale = True, d = 5)}")
+X = create_X(x.flatten(), y.flatten(), 15)
+train_test_terrain = train_test_split(X, terrain1.flatten(), test_size = 0.4)
+print(train_test_terrain[0].shape)
+print(train_test_terrain[1].shape)
+print(train_test_terrain[2].shape)
+print(train_test_terrain[3].shape)
+print(f"OLS terrain: {evaluate_method(ols, train_test_terrain, scale = False, d = 15)}")
 
 
 print(x.shape)
@@ -344,6 +359,32 @@ print(terrain1.shape)
 plt.figure()
 plt.title('Terrain over Norway 1')
 plt.imshow(terrain1, cmap='gray')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.show()
+
+
+
+scaler = StandardScaler()
+#scaler = MaxAbsScaler()
+scaler.fit(train_test_terrain[0])
+train_test_terrain[0] = scaler.transform(train_test_terrain[0])
+train_test_terrain[1] = scaler.transform(train_test_terrain[1])
+scaler2 = StandardScaler()
+#scaler2 = MaxAbsScaler()
+scaler2.fit(train_test_terrain[2].reshape(-1,1))
+train_test_terrain[2] = scaler2.transform(train_test_terrain[2].reshape(-1,1))
+train_test_terrain[3] = scaler2.transform(train_test_terrain[3].reshape(-1,1))
+
+
+beta_terrain = ols(train_test_terrain[0], train_test_terrain[2])
+z_terrain = predict(X, beta_terrain).reshape(3601,1801)
+print(z_terrain[1000][500:550])
+print(terrain1[1000][500:550])
+# Show the terrain
+plt.figure()
+plt.title('Terrain over Norway 1')
+plt.imshow(z_terrain, cmap='gray')
 plt.xlabel('X')
 plt.ylabel('Y')
 plt.show()
