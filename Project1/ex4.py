@@ -20,7 +20,7 @@ z_noisy = FrankeFunction(x, y) + noise*0.2
 
 tts = train_test_split(X,z_noisy,test_size=0.2) #Train test split
 
-compl = [3,4,5,6,7,8]
+compl = [3,4,5,6,7,8, 9, 10]
 nlambda = 100
 lambda_values = np.logspace(-6,-2,nlambda)
 print(lambda_values)
