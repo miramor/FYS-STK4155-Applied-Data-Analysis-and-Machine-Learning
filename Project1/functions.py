@@ -45,7 +45,7 @@ def ridge(X, z, lmb):
     return np.linalg.pinv(X.T @ X + lmb*np.identity(X.shape[1])) @ X.T @ z
 
 def lasso(X, z, lmb):
-    reg = Lasso(alpha=lmb, fit_intercept=False)
+    reg = Lasso(alpha=lmb, fit_intercept=True)
     reg.fit(X, z)
     return reg.coef_
 
@@ -89,7 +89,7 @@ def kfold(X,z,k, complex, plot = False): # X = X_train, z = z_train
     mean_mse_test = np.mean(mse_test, axis = 1)
     mean_r2_train = np.mean(r2_train, axis = 1)
     mean_r2_test = np.mean(r2_test, axis = 1)
-    if plot:
+    if plot: 
         plot_mse(mean_mse_train, mean_mse_test, method_header = "k-fold")
 
     return mean_mse_train, mean_r2_train, mean_mse_test, mean_r2_test

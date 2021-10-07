@@ -30,14 +30,14 @@ r2_train_lasso = np.zeros((len(compl), len(lambda_values)))
 
 
 
-"""
+
 for i in range(len(compl)):
     for j in range(len(lambda_values)):
         mse_train_lasso[i,j], r2_train_lasso[i,j], mse_test_lasso[i,j], r2_test_lasso[i,j] = evaluate_method(lasso,
         tts, lmb = lambda_values[j], d=compl[i], scale = False)
 
 print(mse_test_lasso)
-"""
+
 
 
 #plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso', plot_complexity = True, lambdas = lambda_values, complexities = compl)
