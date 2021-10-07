@@ -16,11 +16,11 @@ z = FrankeFunction(x, y)
 complex = 13 #complexity of model
 X = create_X(x,y,complex)
 noise = np.random.normal(0, 1, size=(z.shape))
-z_noisy = FrankeFunction(x, y) + noise
+z_noisy = FrankeFunction(x, y) + noise*0.2
 
 tts = train_test_split(X,z_noisy,test_size=0.2) #Train test split
 
-n_bs = 100 #number of bootstrap cycles
+n_bs = 500 #number of bootstrap cycles
 mse_test = np.zeros((complex, n_bs)) #for storing bootstrap samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
 mse_train = np.zeros((complex, n_bs))
 r2_test = np.zeros((complex, n_bs))
@@ -41,11 +41,11 @@ mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
 
-plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
+#plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
 
 
 #Bootstrap and plot MSE vs # datapoints
-n_points = np.arange(100,10001,100)
+n_points = np.arange(100,500,100)
 
 mse_test_n = np.zeros((len(n_points), n_bs)) #for storing bootstrap samples' MSE for varying sample size (rows:sample size, columns:bootstrap sample)
 mse_train_n = np.zeros((len(n_points), n_bs))
@@ -56,9 +56,9 @@ r2_train_n = np.zeros((len(n_points), n_bs))
 for i in range(len(n_points)): #looping through different sample sizes
     X_data = X[:n_points[i]]
     z_data = z_noisy[:n_points[i]]
-    X_sample, z_sample = bootstrap(X_data,z_data)
-    tts = train_test_split(X_sample,z_sample,test_size=0.2)
     for j in range(n_bs): #looping through different bootstrap cycles
+        X_sample, z_sample = bootstrap(X_data,z_data)
+        tts = train_test_split(X_sample,z_sample,test_size=0.2)
         mse_train_n[i,j], r2_train_n[i,j], mse_test_n[i,j], r2_test_n[i,j] = evaluate_method(ols, tts, scale = True, d = 4)
 
 
