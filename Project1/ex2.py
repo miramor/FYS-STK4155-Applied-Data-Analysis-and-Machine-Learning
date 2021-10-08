@@ -11,14 +11,13 @@ np.random.seed(2405)
 N = 500
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
-
 z = FrankeFunction(x, y)
-complex = 13 #complexity of model
+complex = 10 #complexity of model
 X = create_X(x,y,complex)
 noise = np.random.normal(0, 1, size=(z.shape))
 z_noisy = FrankeFunction(x, y) + noise*0.2
 
-tts = train_test_split(X,z_noisy,test_size=0.2) #Train test split
+tts = train_test_split(X,z_noisy,test_size=0.1) #Train test split
 
 n_bs = 500 #number of bootstrap cycles
 mse_test = np.zeros((complex, n_bs)) #for storing bootstrap samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
@@ -41,11 +40,11 @@ mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
 
-#plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
+plot_mse(mean_mse_train, mean_mse_test, method_header = "Bootstrap")
 
 
 #Bootstrap and plot MSE vs # datapoints
-n_points = np.arange(100,500,100)
+n_points = np.arange(100,2001,50)
 
 mse_test_n = np.zeros((len(n_points), n_bs)) #for storing bootstrap samples' MSE for varying sample size (rows:sample size, columns:bootstrap sample)
 mse_train_n = np.zeros((len(n_points), n_bs))
@@ -54,8 +53,11 @@ r2_train_n = np.zeros((len(n_points), n_bs))
 
 
 for i in range(len(n_points)): #looping through different sample sizes
-    X_data = X[:n_points[i]]
-    z_data = z_noisy[:n_points[i]]
+    x = np.random.uniform(0, 1, n_points[i])
+    y = np.random.uniform(0, 1, n_points[i])
+    noise = np.random.normal(0, 1, size=(x.shape))
+    X_data = create_X(x,y,4)
+    z_data = FrankeFunction(x, y) + noise*0.2
     for j in range(n_bs): #looping through different bootstrap cycles
         X_sample, z_sample = bootstrap(X_data,z_data)
         tts = train_test_split(X_sample,z_sample,test_size=0.2)
@@ -67,4 +69,4 @@ mean_mse_test_n = np.mean(mse_test_n, axis = 1)
 mean_r2_train_n = np.mean(r2_train_n, axis = 1)
 mean_r2_test_n = np.mean(r2_test_n, axis = 1)
 
-plot_mse(mean_mse_train_n, mean_mse_test_n, method_header = "bootstrap", plot_complexity = False, complexities = n_points)
+plot_mse(mean_mse_train_n, mean_mse_test_n, method_header = "Bootstrap", plot_complexity = False, complexities = n_points)

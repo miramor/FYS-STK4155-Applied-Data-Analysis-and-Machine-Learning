@@ -44,7 +44,7 @@ ticksize = 19
 
 #Plot the CI's
 plt.errorbar(range(len(beta_l)), np.log(abs(beta_l)), np.log(beta_sd_l), linestyle='None', marker = 'o', ecolor = 'red')
-plt.title(r"The logarithmic absolute values to $\beta$ and the logarithmic standard deviation", fontsize=labelsize)
+plt.title(r"The logarithmic absolute values of $\beta$ and the logarithmic standard deviation", fontsize=labelsize)
 plt.xlabel(r"$\beta_i$", fontsize=labelsize)
 plt.ylabel(r"log(abs($\beta$))", fontsize=labelsize)
 plt.xticks(fontsize=ticksize)

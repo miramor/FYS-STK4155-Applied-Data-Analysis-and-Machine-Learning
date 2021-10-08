@@ -49,6 +49,15 @@ def lasso(X, z, lmb):
     reg.fit(X, z)
     return reg.coef_
 
+def predict_lasso(X_train, X_test, z_train, lmb):
+    reg = Lasso(alpha=lmb, fit_intercept=False)
+    reg.fit(X_train, z_train)
+
+    z_tilde = reg.predict(X_train)
+    z_predict = reg.predict(X_test)
+
+    return z_tilde, z_predict
+
 def var_beta(X): #taking in X = X_train
         return np.diag(X.T @ X)
 
@@ -121,9 +130,11 @@ def evaluate_method(method, train_test_l, d, scale = False, lmb = False, first_c
 
     if lmb != False:
         beta = method(X_train, z_train, lmb)
+        #z_tilde, z_predict = predict_lasso(X_train, X_test, z_train, lmb)
+
     else:
         beta = method(X_train,z_train)
-    #print(beta.shape)
+
     z_tilde = predict(X_train, beta)
     z_predict = predict(X_test, beta)
 
@@ -132,6 +143,7 @@ def evaluate_method(method, train_test_l, d, scale = False, lmb = False, first_c
 
     r2_tilde = r2(z_train, z_tilde)
     r2_predict = r2(z_test, z_predict)
+
     if return_beta == False:
         return mse_tilde, r2_tilde, mse_predict, r2_predict
     else:
@@ -185,14 +197,15 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
             plt.savefig(f"MSE_bootstrapDatapoints.png")
             plt.show()
             return
-    plt.legend(fontsize=labelsize)
+    plt.legend(fontsize=labelsize, loc='center left', bbox_to_anchor=(1, 0.5))
     plt.xticks(fontsize=ticksize)
     plt.yticks(fontsize=ticksize)
     #plt.yticks(fonsize=ticksize)
     plt.ylabel("MSE", fontsize=labelsize)
-    plt.title(f"Mean Squared Error {method_header}", fontsize=labelsize)
+    title_header = (" ").join(method_header.split("_"))
+    plt.title(f"Mean Squared Error {title_header}", fontsize=labelsize)
     plt.grid()
-    plt.savefig(f"MSE_{method_header}.png")
+    plt.savefig(f"MSE_{method_header}.png", bbox_inches='tight')
     plt.show()
 
 
