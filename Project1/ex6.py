@@ -135,18 +135,20 @@ for j in range(n_bs): #looping through bootstrap samples
 for i in range(len(compl)):
     for j in range(len(lambda_values)):
         mse_train_ridge[i,j], r2_train_ridge[i,j], mse_test_ridge[i,j], r2_test_ridge[i,j] = evaluate_method(ridge,
-        tts, lmb = lambda_values[j], d=compl[i], scale = False)
+        tts, lmb = lambda_values[j], d=compl[i])
 
 
 plot_mse(mse_train_ridge, mse_test_ridge, method_header = "ridge_terrain", lambdas = lambda_values, plot_complexity = True, complexities = compl)
 min_mse_index = np.argmin(mse_test_ridge[-1])
 lmb_optimal = lambda_values[min_mse_index]
 print(f"Optimal lambda: {lmb_optimal}")
-ridge_eval = evaluate_method(ridge, tts, scale = False, d = 25, lmb = lmb_optimal)
+ridge_eval = evaluate_method(ridge, tts, d = 25, lmb = lmb_optimal)
 print(f"MSE for best OLS model: {ols_eval[2]:.5f}")
 print(f"MSE for best ridge model: {ridge_eval[2]:.5f}")
 
 #print(f"Ridge: {evaluate_method(ridge, test_train_l, scale = True, d = 5)}")
+
+
 """
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
 _,_,_,_,beta_terrain = evaluate_method(ridge, tts, scale = True, d = complexity, lmb = lambda_values[] return_beta = True)

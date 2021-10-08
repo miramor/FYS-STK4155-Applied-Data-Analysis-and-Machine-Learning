@@ -27,21 +27,22 @@ print(f"OLS: {evaluate_method(ols, test_train_l, scale = True, d = 5)}") #Evalua
 noise = np.random.normal(0, 1, size=(z.shape)) #Make random noise
 z_noisy = FrankeFunction(x, y) + noise*0.1 #Add noise to the z values of the FrankeFunction
 
-test_train_l_noise = train_test_split(X,z_noisy,test_size=0.2)
-print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = False, d = 5)}")
-print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = True, d = 5)}")
-variance_beta = var_beta(test_train_l_noise[0])
-beta_l = ols(test_train_l_noise[0], test_train_l_noise[2])
-confidence_interval = ci(beta_l, variance_beta, N)
+test_train_l_noise = train_test_split(X,z_noisy,test_size=0.2) #Split the noisy data into test and train sets
+print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = False, d = 5)}") #Evaluate the noisy data with degree = 5
+print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = True, d = 5)}") #Evaluate the noisy data without degree = 5
 
-beta_sd_l = variance_beta*(1.96/np.sqrt(N))
-print(len(beta_l))
-print(beta_sd_l)
-print(np.log(beta_l))
+#Calculate the confidence intervals for all beta values
+variance_beta = var_beta(test_train_l_noise[0]) #Find the variance of the beta values
+beta_l = ols(test_train_l_noise[0], test_train_l_noise[2]) #Calculate the optimal beta values for the given dataset
+confidence_interval = ci(beta_l, variance_beta, N) #Find the confidence interval
 
+beta_sd_l = variance_beta*(1.96/np.sqrt(N)) #Find the range of each CI
+
+#Set label and tick size
 labelsize=21
 ticksize = 19
 
+#Plot the CI's
 plt.errorbar(range(len(beta_l)), np.log(abs(beta_l)), np.log(beta_sd_l), linestyle='None', marker = 'o', ecolor = 'red')
 plt.title(r"The logarithmic absolute values to $\beta$ and the logarithmic standard deviation", fontsize=labelsize)
 plt.xlabel(r"$\beta_i$", fontsize=labelsize)

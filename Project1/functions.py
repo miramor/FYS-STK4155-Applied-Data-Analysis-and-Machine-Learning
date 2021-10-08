@@ -45,7 +45,7 @@ def ridge(X, z, lmb):
     return np.linalg.pinv(X.T @ X + lmb*np.identity(X.shape[1])) @ X.T @ z
 
 def lasso(X, z, lmb):
-    reg = Lasso(alpha=lmb, fit_intercept=True)
+    reg = Lasso(alpha=lmb, fit_intercept=False)
     reg.fit(X, z)
     return reg.coef_
 
@@ -83,18 +83,18 @@ def kfold(X,z,k, complex, plot = False): # X = X_train, z = z_train
             z_test = z[j*split:(j+1)*split]
         tts = [X_train, X_test, z_train, z_test]
         for i in range(complex): #looping through complexity of model
-            mse_train[i,j], r2_train[i,j], mse_test[i,j], r2_test[i,j] = evaluate_method(ols, tts, scale = True, d = i+1)
+            mse_train[i,j], r2_train[i,j], mse_test[i,j], r2_test[i,j] = evaluate_method(ols, tts, d = i+1)
 
     mean_mse_train = np.mean(mse_train, axis = 1) #calculating mean of MSE of all kfold samples
     mean_mse_test = np.mean(mse_test, axis = 1)
     mean_r2_train = np.mean(r2_train, axis = 1)
     mean_r2_test = np.mean(r2_test, axis = 1)
-    if plot: 
+    if plot:
         plot_mse(mean_mse_train, mean_mse_test, method_header = "k-fold")
 
     return mean_mse_train, mean_r2_train, mean_mse_test, mean_r2_test
 
-def evaluate_method(method, train_test_l, d, scale = True, lmb = False, first_col = True, return_beta = False):
+def evaluate_method(method, train_test_l, d, scale = False, lmb = False, first_col = True, return_beta = False):
 
     X_train, X_test, z_train, z_test = train_test_l
     l = int((d+1)*(d+2)/2)
@@ -157,14 +157,19 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
 
     else:
         if plot_complexity:
-            if method_header == "kfold":
+            if method_header.upper() == "KFOLD" or method_header.upper() == "K-FOLD":
                 for i in range(len(complexities)):
                     plt.plot(range(1,degree+1), mse_test[:,i], label=f"k = {complexities[i]}")
                 plt.xlabel("Complexity", fontsize=labelsize)
             else:
-                plt.plot(range(1,degree+1), mse_train, label="MSE train")
-                plt.plot(range(1,degree+1), mse_test, label="MSE test")
-                plt.xlabel("Complexity", fontsize=labelsize)
+                if complexities != False:
+                    plt.plot(complexities, mse_train, label="MSE train")
+                    plt.plot(complexities, mse_test, label="MSE test")
+                    plt.xlabel("Complexity", fontsize=labelsize)
+                else:
+                    plt.plot(range(1, degree+1), mse_train, label="MSE train")
+                    plt.plot(range(1, degree+1), mse_test, label="MSE test")
+                    plt.xlabel("Complexity", fontsize=labelsize)
         else:
             n_points = complexities
             plt.plot(n_points, mse_train, label="MSE train")

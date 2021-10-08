@@ -29,4 +29,4 @@ r2_test_kfold = np.zeros((complex, len(k)))
 for i in range(len(k)):
     mse_train_kfold[:,i], r2_train_kfold[:,i], mse_test_kfold[:,i], r2_test_kfold[:,i] = kfold(X, z_noisy, k[i], complex)
 
-plot_mse(mse_train_kfold, mse_test_kfold, method_header = "kfold", complexities = k)
+plot_mse(mse_train_kfold, mse_test_kfold, method_header = "Kfold", complexities = k)
