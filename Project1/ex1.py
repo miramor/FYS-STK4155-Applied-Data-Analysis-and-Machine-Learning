@@ -6,22 +6,20 @@ import functions
 importlib.reload(functions)
 from functions import *
 
-np.random.seed(2405)
+np.random.seed(2405) # Set a random seed
 
-N = 500
-x = np.random.uniform(0, 1, N)
-y = np.random.uniform(0, 1, N)
-# Make data.
-#x = np.arange(0, 1, 0.001)
-#y = np.arange(0, 1, 0.001)
+N = 500 #Number of datapoints
+x = np.random.uniform(0, 1, N) #Randomly creates N x's
+y = np.random.uniform(0, 1, N) #Randomly creates N y's
 
-#x1, y1 = np(x,y)
-z = FrankeFunction(x, y)
-#z = FrankeFunction(x, y)
-complex = 13 #complexity of model
-X = create_X(x,y,complex)
+z = FrankeFunction(x, y) #Find the true FrankeFunction values to the given x and y
 
-test_train_l = train_test_split(X,z,test_size=0.2)
+complex = 13 #Choose the highest complexity we will look at
+
+X = create_X(x,y,complex) #Create the design matrix X
+
+test_train_l = train_test_split(X,z,test_size=0.2) #Split the data into training and test sets
+
 #Exercise 1
 print("OLS for (MSE test, R2 test, MSE train, MSE train)")
 print(f"OLS without noise (not scaled): {evaluate_method(ols, test_train_l, scale = False, d = 5)}")
@@ -41,11 +39,13 @@ beta_sd_l = variance_beta*(1.96/np.sqrt(N))
 #print(beta_sd_l)
 #print(np.log(beta_l))
 
+#Set label and tick size
 labelsize=21
 ticksize = 19
 
+#Plot the CI's
 plt.errorbar(range(len(beta_l)), np.log(abs(beta_l)), np.log(beta_sd_l), linestyle='None', marker = 'o', ecolor = 'red')
-plt.title(r"The logarithmic absolute values to $\beta$ and the logarithmic standard deviation", fontsize=labelsize)
+plt.title(r"The logarithmic absolute values of $\beta$ and the logarithmic standard deviation", fontsize=labelsize)
 plt.xlabel(r"$\beta_i$", fontsize=labelsize)
 plt.ylabel(r"log(abs($\beta$))", fontsize=labelsize)
 plt.xticks(fontsize=ticksize)
