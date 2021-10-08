@@ -6,28 +6,27 @@ import functions
 importlib.reload(functions)
 from functions import *
 
-np.random.seed(2405)
+np.random.seed(2405) # Set a random seed
 
-N = 500
-x = np.random.uniform(0, 1, N)
-y = np.random.uniform(0, 1, N)
-# Make data.
-#x = np.arange(0, 1, 0.001)
-#y = np.arange(0, 1, 0.001)
+N = 500 #Number of datapoints
+x = np.random.uniform(0, 1, N) #Randomly creates N x's
+y = np.random.uniform(0, 1, N) #Randomly creates N y's
 
-#x1, y1 = np(x,y)
-z = FrankeFunction(x, y)
-#z = FrankeFunction(x, y)
-complex = 13 #complexity of model
-X = create_X(x,y,complex)
+z = FrankeFunction(x, y) #Find the true FrankeFunction values to the given x and y
 
-test_train_l = train_test_split(X,z,test_size=0.2)
+complex = 13 #Choose the highest complexity we will look at
+
+X = create_X(x,y,complex) #Create the design matrix X
+
+test_train_l = train_test_split(X,z,test_size=0.2) #Split the data into training and test sets
+
 #Exercise 1
-print(f"OLS: {evaluate_method(ols, test_train_l, scale = False, d = 5)}")
-print(f"OLS: {evaluate_method(ols, test_train_l, scale = True, d = 5)}")
+print(f"OLS: {evaluate_method(ols, test_train_l, scale = False, d = 5)}") #Evaluate the model for complexity 5 without scaling the data
+print(f"OLS: {evaluate_method(ols, test_train_l, scale = True, d = 5)}") #Evaluate the model for complexity 5 with scaling the data
 
-noise = np.random.normal(0, 1, size=(z.shape))
-z_noisy = FrankeFunction(x, y) + noise*0.1
+noise = np.random.normal(0, 1, size=(z.shape)) #Make random noise
+z_noisy = FrankeFunction(x, y) + noise*0.1 #Add noise to the z values of the FrankeFunction
+
 test_train_l_noise = train_test_split(X,z_noisy,test_size=0.2)
 print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = False, d = 5)}")
 print(f"OLS with noise: {evaluate_method(ols, test_train_l_noise, scale = True, d = 5)}")

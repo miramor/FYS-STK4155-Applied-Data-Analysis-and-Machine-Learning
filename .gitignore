@@ -21,5 +21,8 @@
 # Mac directory file
 .DS_Store
 
+#Folders
+Project1/PictureUploads
+Project1/uploaded_plots
 
 

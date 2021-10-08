@@ -19,7 +19,7 @@ z_noisy = FrankeFunction(x, y) + noise*0.2
 
 tts = train_test_split(X,z_noisy,test_size=0.1) #Train test split
 
-n_bs = 100 #number of bootstrap cycles
+n_bs = 500 #number of bootstrap cycles
 mse_test = np.zeros((complex, n_bs)) #for storing bootstrap samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
 mse_train = np.zeros((complex, n_bs))
 r2_test = np.zeros((complex, n_bs))
