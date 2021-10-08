@@ -8,11 +8,11 @@ from functions import *
 
 np.random.seed(2405)
 
-N = 500
-x = np.random.uniform(0, 1, N)
-y = np.random.uniform(0, 1, N)
-z = FrankeFunction(x, y)
-complex = 10 #complexity of model
+N = 500 #Number of datapoints
+x = np.random.uniform(0, 1, N) #Randomly creates N x's
+y = np.random.uniform(0, 1, N) #Randomly creates N y's
+z = FrankeFunction(x, y) #Find the true FrankeFunction values to the given x and y
+complex = 11 #complexity of model
 X = create_X(x,y,complex)
 noise = np.random.normal(0, 1, size=(z.shape))
 z_noisy = FrankeFunction(x, y) + noise*0.2
@@ -41,6 +41,12 @@ mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
 
 plot_mse(mean_mse_train, mean_mse_test, method_header = "Bootstrap")
+
+compl_optimal_index = np.argmin(mean_mse_test)
+compl_optimal = compl_optimal_index + 1
+ols_eval = evaluate_method(ols, tts, d = compl_optimal)
+print(f"MSE for best OLS model: {ols_eval[2]:.5f}")
+
 
 
 #Bootstrap and plot MSE vs # datapoints

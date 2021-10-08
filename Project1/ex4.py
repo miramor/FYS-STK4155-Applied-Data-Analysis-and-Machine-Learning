@@ -13,17 +13,17 @@ x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
 
 z = FrankeFunction(x, y)
-complex = 10 #complexity of model
+complex = 13 #complexity of model
 X = create_X(x,y,complex)
 noise = np.random.normal(0, 1, size=(z.shape))
 z_noisy = FrankeFunction(x, y) + noise*0.2
 
 tts = train_test_split(X,z_noisy,test_size=0.2) #Train test split
 
-compl = [3,4,5,6,7,8, 9, 10]
+compl = [3,4,5,6,7,8, 9, 10,11,12,13]
 nlambda = 200
 lambda_values = np.logspace(-10,-0.5,nlambda)
-print(lambda_values)
+
 mse_test_ridge = np.zeros((len(compl), len(lambda_values)))
 mse_train_ridge = np.zeros((len(compl), len(lambda_values)))
 r2_test_ridge = np.zeros((len(compl), len(lambda_values)))
@@ -59,9 +59,12 @@ mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
 
-plot_mse(mean_mse_train, mean_mse_test, method_header = "Bootstrap ridge", plot_complexity = True, complexities = compl)
+plot_mse(mean_mse_train, mean_mse_test, method_header = "Bootstrap_Ridge", plot_complexity = True, complexities = compl)
 
-min_mse_index = np.argmin(mse_test_ridge[-1])
+compl_optimal_index = np.argmin(mean_mse_test)
+min_mse_index = np.argmin(mse_test_ridge[compl_optimal_index])
+compl_optimal =compl[compl_optimal_index]
 lmb_optimal = lambda_values[min_mse_index]
-ridge_eval = evaluate_method(ridge, tts, d = 4, lmb = lmb_optimal)
+ridge_eval = evaluate_method(ridge, tts, d = compl_optimal, lmb = lmb_optimal)
+print(f"Optimal lambda: {lmb_optimal}")
 print(f"MSE for best ridge model: {ridge_eval[2]:.5f}")

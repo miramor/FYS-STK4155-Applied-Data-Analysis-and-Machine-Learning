@@ -11,6 +11,11 @@ from sklearn.linear_model import Lasso
 from sklearn import linear_model
 from imageio import imread
 
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+
 plt.rcParams['figure.figsize'] = (10.,10.)
 def mse(z, z_model):
     n = len(z)
@@ -40,6 +45,7 @@ def create_X(x, y, n ):
 
 def ols(X, z):
     return np.linalg.pinv(X.T @ X) @ X.T @ z
+
 
 def ridge(X, z, lmb):
     return np.linalg.pinv(X.T @ X + lmb*np.identity(X.shape[1])) @ X.T @ z
