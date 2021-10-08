@@ -40,7 +40,7 @@ mean_mse_test = np.mean(mse_test, axis = 1)
 mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
 
-plot_mse(mean_mse_train, mean_mse_test, method_header = "bootstrap")
+plot_mse(mean_mse_train, mean_mse_test, method_header = "Bootstrap")
 
 
 #Bootstrap and plot MSE vs # datapoints
@@ -69,4 +69,4 @@ mean_mse_test_n = np.mean(mse_test_n, axis = 1)
 mean_r2_train_n = np.mean(r2_train_n, axis = 1)
 mean_r2_test_n = np.mean(r2_test_n, axis = 1)
 
-plot_mse(mean_mse_train_n, mean_mse_test_n, method_header = "bootstrap", plot_complexity = False, complexities = n_points)
+plot_mse(mean_mse_train_n, mean_mse_test_n, method_header = "Bootstrap", plot_complexity = False, complexities = n_points)

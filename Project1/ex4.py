@@ -40,4 +40,4 @@ for i in range(len(compl)):
         tts, lmb = lambda_values[j], d=compl[i], scale = True)
 
 
-plot_mse(mse_train_ridge, mse_test_ridge, method_header = "ridge", lambdas = lambda_values, plot_complexity = True, complexities = compl)
+plot_mse(mse_train_ridge, mse_test_ridge, method_header = "Ridge", lambdas = lambda_values, plot_complexity = True, complexities = compl)

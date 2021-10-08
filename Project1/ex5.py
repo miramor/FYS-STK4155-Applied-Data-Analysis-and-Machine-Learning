@@ -21,7 +21,7 @@ z_noisy = FrankeFunction(x, y) + noise*0.2
 tts = train_test_split(X,z_noisy,test_size=0.2) #Train test split
 
 compl = [3,4,5,6,7,8,9,10]
-nlambda = 100
+nlambda = 20
 lambda_values = np.logspace(-5,-3,nlambda) #[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 0.75, 1]
 mse_test_lasso = np.zeros((len(compl), len(lambda_values)))
 mse_train_lasso = np.zeros((len(compl), len(lambda_values)))
@@ -37,5 +37,5 @@ for i in range(len(compl)):
         tts, lmb = lambda_values[j], d=compl[i], scale = False)
 
 
-plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'lasso',
+plot_mse(mse_train_lasso, mse_test_lasso, method_header = 'Lasso',
     plot_complexity = True, lambdas = lambda_values, complexities = compl)
