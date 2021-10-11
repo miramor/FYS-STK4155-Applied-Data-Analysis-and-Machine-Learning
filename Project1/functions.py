@@ -11,22 +11,23 @@ from sklearn.linear_model import Lasso
 from sklearn import linear_model
 from imageio import imread
 
-def warn(*args, **kwargs):
+def warn(*args, **kwargs): #Ignore important warnings
     pass
 import warnings
 warnings.warn = warn
 
 plt.rcParams['figure.figsize'] = (10.,10.)
-def mse(z, z_model):
+
+def mse(z, z_model): #Calculates the MSE for a model
     n = len(z)
     mean_se = np.sum((z-z_model)**2)
     return mean_se/n
 
-def r2(z, z_model):
+def r2(z, z_model): #Calculates the R2 score for a model
     n = len(z)
     return 1 - n*mse(z,z_model)/np.sum((z-np.mean(z))**2)
 
-def create_X(x, y, n ):
+def create_X(x, y, n ): #Creates design matrix with data x,y and complexity n
     if len(x.shape) > 1:
     	x = np.ravel(x)
     	y = np.ravel(y)
@@ -43,28 +44,19 @@ def create_X(x, y, n ):
     return X
 
 
-def ols(X, z):
+def ols(X, z): #Finds optimal beta for the Ordinary Least Squares method
     return np.linalg.pinv(X.T @ X) @ X.T @ z
 
 
-def ridge(X, z, lmb):
+def ridge(X, z, lmb): #Finds optimal beta for Ridge
     return np.linalg.pinv(X.T @ X + lmb*np.identity(X.shape[1])) @ X.T @ z
 
-def lasso(X, z, lmb):
+def lasso(X, z, lmb): #Finds optimal beta for Lasso
     reg = Lasso(alpha=lmb, fit_intercept=False)
     reg.fit(X, z)
     return reg.coef_
 
-def predict_lasso(X_train, X_test, z_train, lmb):
-    reg = Lasso(alpha=lmb, fit_intercept=False)
-    reg.fit(X_train, z_train)
-
-    z_tilde = reg.predict(X_train)
-    z_predict = reg.predict(X_test)
-
-    return z_tilde, z_predict
-
-def var_beta(X): #taking in X = X_train
+def var_beta(X): #taking in X = X_train, calculates the variance of beta
         return np.diag(X.T @ X)
 
 def predict(X, beta):
@@ -77,15 +69,14 @@ def FrankeFunction(x,y):
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
 
-def kfold(X,z,k, complex, plot = False): # X = X_train, z = z_train
-    #Exercise 2
+def kfold(X,z,k, complex): #Implements k-fold method,  X = X_train, z = z_train
     mse_test = np.zeros((complex, k)) #for storing kfold samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
     mse_train = np.zeros((complex, k))
     r2_test = np.zeros((complex, k))
     r2_train = np.zeros((complex, k))
     n = len(X)
-    split = int(n/k)
-    for j in range(k):
+    split = int(n/k) #Size of the folds
+    for j in range(k): #Splits into training and test set
         if j == k-1:
             X_train = X[:j*split]
             X_test = X[j*split:]
@@ -104,8 +95,6 @@ def kfold(X,z,k, complex, plot = False): # X = X_train, z = z_train
     mean_mse_test = np.mean(mse_test, axis = 1)
     mean_r2_train = np.mean(r2_train, axis = 1)
     mean_r2_test = np.mean(r2_test, axis = 1)
-    if plot:
-        plot_mse(mean_mse_train, mean_mse_test, method_header = "k-fold")
 
     return mean_mse_train, mean_r2_train, mean_mse_test, mean_r2_test
 
@@ -113,7 +102,7 @@ def evaluate_method(method, train_test_l, d, scale = False, lmb = False, first_c
 
     X_train, X_test, z_train, z_test = train_test_l
     l = int((d+1)*(d+2)/2)
-    X_train = X_train[:,:l]
+    X_train = X_train[:,:l] #Slice to include features up to a certain complexity
     X_test = X_test[:,:l]
     if first_col == False:
         X_train = X_train[:,1:]
@@ -134,9 +123,8 @@ def evaluate_method(method, train_test_l, d, scale = False, lmb = False, first_c
         # z_train = scaler2.transform(z_train)
         # z_test = scaler2.transform(z_test)
 
-    if lmb != False:
+    if lmb is not False: #Need lambda argument for Ridge and Lasso
         beta = method(X_train, z_train, lmb)
-        #z_tilde, z_predict = predict_lasso(X_train, X_test, z_train, lmb)
 
     else:
         beta = method(X_train,z_train)
@@ -155,7 +143,7 @@ def evaluate_method(method, train_test_l, d, scale = False, lmb = False, first_c
     else:
         return mse_tilde, r2_tilde, mse_predict, r2_predict, beta
 
-def bootstrap(X,z):
+def bootstrap(X,z): #Resamples with replacement
     n = len(z)
     data = np.random.randint(0,n,n)
     X_new = X[data] #random chosen columns for new design matrix
@@ -167,6 +155,7 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
     ticksize = 19
     degree = mse_train.shape[0]
 
+    #Plots with lambda on x-axis
     if type(lambdas) != type(False):
         n_lmd = len(lambdas)
         for i in range(degree):
@@ -174,7 +163,7 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
             plt.xlabel("$ \lambda $", fontsize=labelsize)
 
     else:
-        if plot_complexity:
+        if plot_complexity: #Plots with complexity on x-axis
             if method_header.upper() == "KFOLD" or method_header.upper() == "K-FOLD":
                 for i in range(len(complexities)):
                     plt.plot(range(1,degree+1), mse_test[:,i], label=f"k = {complexities[i]}")
@@ -188,7 +177,7 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
                     plt.plot(range(1, degree+1), mse_train, label="MSE train")
                     plt.plot(range(1, degree+1), mse_test, label="MSE test")
                     plt.xlabel("Complexity", fontsize=labelsize)
-        else:
+        else: #For exercise 2, plots with n points on x-axis
             n_points = complexities
             plt.plot(n_points, mse_train, label="MSE train")
             plt.plot(n_points, mse_test, label="MSE test")
@@ -203,6 +192,7 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
             plt.savefig(f"MSE_bootstrapDatapoints.png")
             plt.show()
             return
+
     plt.legend(fontsize=labelsize, loc='center left', bbox_to_anchor=(1, 0.5))
     plt.xticks(fontsize=ticksize)
     plt.yticks(fontsize=ticksize)
@@ -215,7 +205,7 @@ def plot_mse(mse_train, mse_test, method_header = '', plot_complexity = True, la
     plt.show()
 
 
-def ci(beta, var, n, z=1.96):
+def ci(beta, var, n, z=1.96): #Confidence interval for beta
     ci1 = beta - z*var/np.sqrt(n)
     ci2 = beta + z*var/np.sqrt(n)
     ci_final = []

@@ -8,6 +8,7 @@ from functions import *
 
 np.random.seed(2405)
 
+#Same as ex1 and ex2
 N = 500
 x = np.random.uniform(0, 1, N)
 y = np.random.uniform(0, 1, N)
@@ -21,12 +22,12 @@ z_noisy = FrankeFunction(x, y) + noise*0.2
 tts = train_test_split(X,z_noisy,test_size=0.2) #Train test split
 
 k = np.arange(5,11)
-mse_train_kfold = np.zeros((complex, len(k)))
+mse_train_kfold = np.zeros((complex, len(k))) #Arrays for storing the evaluation values
 mse_test_kfold = np.zeros((complex, len(k)))
 r2_train_kfold = np.zeros((complex, len(k)))
 r2_test_kfold = np.zeros((complex, len(k)))
 
-for i in range(len(k)):
+for i in range(len(k)): #Loops through the different number of k falds
     mse_train_kfold[:,i], r2_train_kfold[:,i], mse_test_kfold[:,i], r2_test_kfold[:,i] = kfold(X, z_noisy, k[i], complex)
 
 plot_mse(mse_train_kfold, mse_test_kfold, method_header = "Kfold", complexities = k)
