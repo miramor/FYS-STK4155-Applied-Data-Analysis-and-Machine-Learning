@@ -10,8 +10,10 @@
 # Data files
 *.txt
 *.PNG
+*.png
 *.csv
 *.PDF
+*.pyc
 
 # cpp executables
 *.exe

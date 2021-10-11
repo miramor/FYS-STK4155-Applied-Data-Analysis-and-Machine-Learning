@@ -7,6 +7,11 @@ import importlib
 import functions
 importlib.reload(functions)
 from functions import *
+"""
+Exercise 6:
+Running OLS, Ridge and Lasso on real terrain data
+Finding mean MSE using bootstrap
+"""
 
 np.random.seed(2405)
 labelsize=21

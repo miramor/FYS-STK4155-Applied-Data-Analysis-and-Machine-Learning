@@ -5,7 +5,12 @@ import importlib
 import functions
 importlib.reload(functions)
 from functions import *
-
+"""
+Exercise 4:
+Running Ridge on the Franke Function for different lambdas as a function of the complexty of the model
+-->Plotting MSE as a function of lambdas
+For best lambda value, plot mean MSE (using bootstrap) as a function of complexity
+"""
 np.random.seed(2405)
 
 #Make the same data as in the previous tasks

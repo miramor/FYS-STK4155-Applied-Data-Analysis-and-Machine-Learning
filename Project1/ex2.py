@@ -5,6 +5,13 @@ import importlib
 import functions
 importlib.reload(functions)
 from functions import *
+"""
+Exercise 2:
+Running OLS on the Franke Function as a function of the complexity of the model and using bootstrap as the resampling method
+-->Plot mean MSE as function of complexity
+Running OLS on the Franke Function for a given complexity and as a function of the size of the data set (number of datapoints)
+-->Plot mean MSE as a function of datapoints
+"""
 
 np.random.seed(2405)
 

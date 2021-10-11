@@ -10,7 +10,9 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.linear_model import Lasso
 from sklearn import linear_model
 from imageio import imread
-
+"""
+Functions needed for exercise 1 to 6
+"""
 def warn(*args, **kwargs): #Ignore important warnings
     pass
 import warnings
