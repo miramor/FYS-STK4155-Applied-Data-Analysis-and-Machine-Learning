@@ -120,12 +120,10 @@ mean_r2_train = np.mean(r2_train, axis = 1)
 mean_r2_test = np.mean(r2_test, axis = 1)
 
 
-
-
-compl_optimal_index = np.argmin(mean_mse_test)
+compl_optimal_index = np.argmin(mean_mse_test) #Finding optimal complexity from lowest MSE
 min_mse_index = np.argmin(mse_test_ridge[compl_optimal_index])
 compl_optimal_ridge =complexities[compl_optimal_index]
-lmb_optimal_ridge = lambda_values[min_mse_index]
+lmb_optimal_ridge = lambda_values[min_mse_index] #Finding optimal lambda for given complexity
 ridge_eval = evaluate_method(ridge, tts, d = compl_optimal_ridge, lmb = lmb_optimal_ridge)
 mse_ridge = ridge_eval[2]
 print(f"Optimal lambda for ridge: {lmb_optimal_ridge} | Optimal complexity: {compl_optimal_ridge}")
@@ -133,7 +131,7 @@ print(f"MSE for best ridge model: {mse_ridge:.5f}")
 
 #Lasso
 nlambda = 20
-lambda_values = np.logspace(-10,-6,nlambda)
+lambda_values = np.logspace(-6,-2,nlambda)
 mse_test_lasso = np.zeros(len(lambda_values))
 mse_train_lasso = np.zeros(len(lambda_values))
 r2_test_lasso = np.zeros(len(lambda_values))
@@ -141,7 +139,7 @@ r2_train_lasso = np.zeros(len(lambda_values))
 
 for j in range(len(lambda_values)):
     mse_train_lasso[j], r2_train_lasso[j], mse_test_lasso[j], r2_test_lasso[j] = evaluate_method(lasso,
-    tts, lmb = lambda_values[j], d=20)
+    tts, lmb = lambda_values[j], d=35)
 
 
 mse_test = np.zeros(n_bs) #for storing bootstrap samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample
@@ -172,13 +170,10 @@ print(f"Optimal lambda for lasso: {lmb_optimal} | Optimal complexity: {35}")
 print(f"MSE for best lasso model: {mse_lasso:.5f}")
 
 
-
-#Selecting the best model:
-
 #Plot predictions for the best model
 fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-a,b,c,d,beta_terrain = evaluate_method(best_method, tts, scale = False, d = compl_optimal_ridge, return_beta = True)
-l = int((25+1)*(25+2)/2)
+a,b,c,d,beta_terrain = evaluate_method(ridge, tts, scale = False, d = compl_optimal_ridge, lmb = lmb_optimal_ridge, return_beta = True)
+l = int((compl_optimal_ridge+1)*(compl_optimal_ridge+2)/2)
 z_terrain = predict(X[:,:l], beta_terrain).reshape(200,200)
 ax.plot_surface(x*max_y, y*max_y, z_terrain)
 ax.set_xlabel("x", fontsize = labelsize)
