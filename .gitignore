@@ -12,6 +12,7 @@
 *.PNG
 *.csv
 *.PDF
+*.pyc
 
 # cpp executables
 *.exe
