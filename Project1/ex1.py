@@ -5,6 +5,12 @@ import importlib
 import functions
 importlib.reload(functions)
 from functions import *
+"""
+Exercise 1:
+Running ordinary least squares on the Franke Function printing MSE and R2 for train and test data respectively
+Plotting confidence intervals for beta values
+
+"""
 
 np.random.seed(2405) # Set a random seed
 

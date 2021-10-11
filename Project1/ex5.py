@@ -5,7 +5,12 @@ import importlib
 import functions
 importlib.reload(functions)
 from functions import *
-
+"""
+Exercise 5:
+Running Lasso regression on the Franke functionfor for different lambdas as a function of complexity of the model
+-->Plotting MSE as a function of lambdas
+For best lambda, plot mean MSE (using bootstrap) as a function of complexity
+"""
 
 
 np.random.seed(2405)
