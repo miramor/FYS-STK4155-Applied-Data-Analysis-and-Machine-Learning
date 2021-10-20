@@ -1,14 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import SGDRegressor
+from sklearn.preprocessing import StandardScaler
 
 plt.style.use("seaborn")
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 15
 
 
-def SGD(X, y, M, n_epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
+def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
     n = len(X) #number of datapoints
     m = int(n/M) #number of mini-batch cycles (M: size of batch)
-    for epoch in range(n_epochs):
+    for epoch in range(epochs):
         for i in range(m):
             random_index = np.random.randint(m)
             xi = X[random_index*M:(random_index+1)*M]
@@ -74,7 +76,15 @@ def ols(X, y): #Finds optimal beta for the Ordinary Least Squares method
 def ridge(X, y, lmb): #Finds optimal beta for Ridge
     return np.linalg.pinv(X.T @ X + lmb*np.identity(X.shape[1])) @ X.T @ y
 
-def SklearnSGD(X, y, m):
-    SGDRegressor(max_iter=m, penalty=None, eta0 = 0.1)
+def SklearnSGD(X, y, epochs, penalty, eta, alpha = 0):
+    sgdreg = SGDRegressor(max_iter=epochs, penalty = penalty,
+                          eta0 = eta, learning_rate = 'constant', alpha = alpha, fit_intercept = False)
     sgdreg.fit(X, y)
-    return sgdreg.intercept_, sgdreg.coef_
+    return sgdreg.coef_
+
+def plotmseLR(MSE, LR):
+    plt.plot(LR, MSE)
+    plt.title("Mean squared error as a funciton of the learning rate")
+    plt.xlabel("$\eta$")
+    plt.ylabel("MSE")
+    plt.show()
