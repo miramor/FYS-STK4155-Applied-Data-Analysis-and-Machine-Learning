@@ -55,15 +55,14 @@ print(mse(tts[2],y_tildeRidge1), mse(tts[2],y_tildeSKRidge))
 print(mse(tts[3],y_predictOLS1), mse(tts[3],y_predictSKOLS))
 print(mse(tts[3],y_predictRidge1), mse(tts[3],y_predictSKRidge))
 
-epochsL = np.arange(1000,5001,1000)
-nbatches = [1, 5, 20, 50, 100]
+epochsL = np.arange(5000,10001,1000)
+nbatches = [1, 5, 20, 50, 100,250]
 MSE_train_OLS = np.zeros((len(epochsL), len(nbatches)))
 MSE_test_OLS = np.zeros((len(epochsL), len(nbatches)))
-MSE_train_Ridge = np.zeros((len(epochsL), len(nbatches)))
-MSE_test_Ridge = np.zeros((len(epochsL), len(nbatches)))
 
 #OLS
-print("Start epoch loop")
+"""
+print("Start epoch loop OLS")
 for i in range(len(epochsL)):
     for j in range(len(nbatches)):
         beta = SGD(tts[0], tts[2], M=int((N/nbatches[j])), epochs = epochsL[i], beta = theta, gradCostFunc = gradCostOls, eta = 0.1)
@@ -81,19 +80,18 @@ optimal_epoch_train = epochsL[minMSE_OLS_train_index[0]]
 optimal_epoch_test = epochsL[minMSE_OLS_test_index[0]]
 optimal_batch_train = nbatches[minMSE_OLS_train_index[1]]
 optimal_batch_test = nbatches[minMSE_OLS_test_index[1]]
+print("Results for OLS")
 print(f"Optimal epoch train {optimal_epoch_train}")
 print(f"Optimal epoch test {optimal_epoch_test}")
 print(f"Optimal mini batches train {optimal_batch_train}")
 print(f"Optimal mini batches test {optimal_batch_test}")
 
-etaL = np.logspace(-3,-1,20)
+etaL = np.logspace(-2,-0.8,20)
 
 MSE_train_OLSeta = np.zeros(len(etaL))
 MSE_test_OLSeta = np.zeros(len(etaL))
-MSE_train_Ridgeeta = np.zeros(len(etaL))
-MSE_test_Ridgeeta = np.zeros(len(etaL))
 
-print("Start learning rate loop")
+print("Start learning rate loop OLS")
 for i in range(len(etaL)):
     beta = SGD(tts[0], tts[2], M=int((N/optimal_batch_test)), epochs = optimal_epoch_test, beta = theta, gradCostFunc = gradCostOls, eta = etaL[i])
     ytilde = predict(tts[0],beta)
@@ -101,4 +99,50 @@ for i in range(len(etaL)):
     MSE_train_OLSeta[i] = mse(tts[2],ytilde)
     MSE_test_OLSeta[i] = mse(tts[3],ypredict)
     print(f"{int((i+1)/len(etaL)*100)} % done")
-plotmseLR(MSE_test_OLSeta,etaL)
+plotmseLR(MSE_test_OLSeta, etaL)
+"""
+#Ridge
+MSE_train_Ridge = np.zeros((len(epochsL), len(nbatches)))
+MSE_test_Ridge = np.zeros((len(epochsL), len(nbatches)))
+print("Start epoch loop Ridge")
+for i in range(len(epochsL)):
+    for j in range(len(nbatches)):
+        beta = SGD(tts[0], tts[2], M=int((N/nbatches[j])), epochs = epochsL[i], beta = theta, gradCostFunc = gradCostRidge, eta = 0.1, lmb=0.001)
+        ytilde = predict(tts[0],beta)
+        ypredict = predict(tts[1], beta)
+        MSE_train_Ridge[i, j] = mse(tts[2],ytilde)
+        MSE_test_Ridge[i, j] = mse(tts[3],ypredict)
+
+    print(f"{int((i+1)/len(epochsL)*100)} % done")
+
+minMSE_Ridge_train_index = np.argwhere(MSE_train_Ridge == np.min(MSE_train_Ridge))[0]
+minMSE_Ridge_test_index = np.argwhere(MSE_train_Ridge == np.min(MSE_train_Ridge))[0]
+
+optimal_epoch_train = epochsL[minMSE_Ridge_train_index[0]]
+optimal_epoch_test = epochsL[minMSE_Ridge_test_index[0]]
+optimal_batch_train = nbatches[minMSE_Ridge_train_index[1]]
+optimal_batch_test = nbatches[minMSE_Ridge_test_index[1]]
+print("Results for Ridge")
+print(f"Optimal epoch train {optimal_epoch_train}")
+print(f"Optimal epoch test {optimal_epoch_test}")
+print(f"Optimal mini batches train {optimal_batch_train}")
+print(f"Optimal mini batches test {optimal_batch_test}")
+
+etaLRid = np.logspace(-2,-0.8,20)
+lambdaL = np.logspace(-4,-1,20)
+MSE_train_REL = np.zeros((len(etaLRid), len(lambdaL))) #Ridge Eta Lambda
+MSE_test_REL = np.zeros((len(etaLRid), len(lambdaL)))
+
+print("Start learning rate loop Ridge")
+
+for i in range(len(etaLRid)):
+    for j in range(len(lambdaL)):
+        beta = SGD(tts[0], tts[2], M=int((N/optimal_batch_test)), epochs = optimal_epoch_test, beta = theta, gradCostFunc = gradCostRidge, eta = etaLRid[i], lmb = lambdaL[i])
+        ytilde = predict(tts[0],beta)
+        ypredict = predict(tts[1], beta)
+        MSE_train_REL[i,j] = mse(tts[2],ytilde)
+        MSE_test_REL[i,j] = mse(tts[3],ypredict)
+    print(f"{int((i+1)/len(etaLRid)*100)} % done")
+
+
+plotmseREL(MSE_test_REL, etaLRid, lambdaL)

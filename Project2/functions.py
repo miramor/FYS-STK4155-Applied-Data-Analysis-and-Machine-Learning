@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import SGDRegressor
 from sklearn.preprocessing import StandardScaler
+import seaborn as sns
 
 plt.style.use("seaborn")
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 15
@@ -87,4 +88,16 @@ def plotmseLR(MSE, LR):
     plt.title("Mean squared error as a funciton of the learning rate")
     plt.xlabel("$\eta$")
     plt.ylabel("MSE")
+    plt.savefig("MSELearningRate.pdf")
+    plt.show()
+
+def plotmseREL(MSE,LR,lmb):
+    fig, ax = plt.subplots(figsize = (10, 10))
+    sns.heatmap(MSE, annot=True, ax=ax, cmap="viridis")
+    ax.set_title("MSE Ridge as a function of the learning rate and hyperparameter")
+    ax.set_xticks(LR)
+    ax.set_yticks(lmb)
+    ax.set_xlabel("$\eta$")
+    ax.set_ylabel("$\lambda$")
+    plt.savefig("HeatMapMSE_REL.pdf")
     plt.show()
