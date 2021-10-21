@@ -24,16 +24,17 @@ def softmax(x):
     return exp_term / np.sum(exp_term, keepdims=True)
 
 n_features= X_train.shape[1] #numer of features
-n_hidden_neurons = 10 # number of hidden neurons
+n_hidden_neurons = 5 # number of hidden neurons
 
 #initialise weights and bias
 #hidden layer
 hidden_weights = np.random.randn(n_features, n_hidden_neurons)
-hidden_bias = np.zeros(n_hidden_neurons) + 0.01
+bias = 0.01
+hidden_bias = np.zeros(n_hidden_neurons) + bias
 
 #output layer
 output_weights = np.random.randn(n_hidden_neurons, X_train.shape[0])
-output_bias = 0.01
+output_bias = bias
 
 
 def feed_forward(X): #feed-forward pass
@@ -84,5 +85,8 @@ for i in range(1000):
 a_0, y_tilde = feed_forward(X_train)
 #a_o, y_predict = feed_forward(X_test)
 #print(mse(y_test, y_predict))
-print(mse(y_train, y_tilde))
-X,Y = np.meshgrid(x,y)
+print(f"MSE FFNN: {mse(y_train, y_tilde)}")
+
+betaOLS = ols(X_train, y_train)
+y_tildeOLS = predict(X_train, betaOLS)
+print(f"MSE OLS: {mse(y_train, y_tildeOLS)}")
