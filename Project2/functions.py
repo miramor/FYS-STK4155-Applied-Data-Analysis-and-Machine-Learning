@@ -6,7 +6,6 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 
 plt.style.use("seaborn")
-plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 15
 
 
 def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
@@ -32,6 +31,8 @@ def gradCostRidge(X, y, beta, lmb): #returns gradient of Ridge cost function
 def gradCostOls(X, y, beta): #returns gradient of OLS cost function
     n = len(X)
     return 2/n * X.T @ (X @ beta - y)
+
+
 
 def learningSchedule(t): #Returns learning rate eta
     t0, t1 = 5, 50
@@ -89,16 +90,41 @@ def plotmseLR(MSE, LR):
     plt.title("Mean squared error as a funciton of the learning rate")
     plt.xlabel("$\eta$")
     plt.ylabel("MSE")
-    plt.savefig("MSELearningRate.pdf")
+    plt.savefig("MSELearningRate.pdf", bbox_inches='tight')
     plt.show()
 
 def plotmseREL(MSE,LR,lmb):
     fig, ax = plt.subplots(figsize = (10, 10))
     sns.heatmap(MSE, annot=True, ax=ax, cmap="viridis")
-    ax.set_title("MSE Ridge as a function of the learning rate and hyperparameter")
+    ax.set_title("Mean squared error as a function of the learning rate and hyperparameter")
     ax.set_xticks(LR)
     ax.set_yticks(lmb)
     ax.set_xlabel("$\eta$")
     ax.set_ylabel("$\lambda$")
-    plt.savefig("HeatMapMSE_REL.pdf")
+    plt.savefig("HeatMapMSE_REL.pdf", bbox_inches='tight')
     plt.show()
+
+def sigmoid(x, derivative = False): #sigmoid as activation Function
+    if derivative:
+        return sigmoid(x)*(1-sigmoid(x))
+    else:
+        return 1/(1 + np.exp(-x))
+
+
+def relu(x, derivative = False):
+    if derivative:
+        return np.where(x < 0, 0, 1)
+    else:
+        return np.maximum(x, 0)
+
+def leaky_relu(x, alpha = 0.1, derivative = False):
+    if derivative:
+        return np.where(x < 0, alpha, 1)
+    else:
+        return np.where(x < 0, x*alpha, x)
+
+def softmax(x, derivative = False):
+    if derivative:
+        x * np.exp(x) / np.sum(np.exp(x), keepdims=True)
+    else:
+        return np.exp(x) / np.sum(np.exp(x), keepdims=True)
