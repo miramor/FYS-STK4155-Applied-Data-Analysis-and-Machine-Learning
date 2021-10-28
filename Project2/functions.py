@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 
 plt.style.use("seaborn")
-
+#plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 15; plt.rcParams["xtick.labelsize"] = 15; plt.rcParams["ytick.labelsize"] = 15; plt.rcParams["legend.fontsize"] = 15
 
 def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
     n = len(X) #number of datapoints
@@ -94,11 +94,18 @@ def plotmseLR(MSE, LR):
     plt.show()
 
 def plotmseREL(MSE,LR,lmb):
-    fig, ax = plt.subplots(figsize = (10, 10))
-    sns.heatmap(MSE, annot=True, ax=ax, cmap="viridis")
+    fig, ax = plt.subplots()
+    x_vals = []
+    y_vals = []
+    for i in range(len(LR)):
+        x_vals.append(np.format_float_scientific(LR[i], precision=1))
+        y_vals.append(np.format_float_scientific(lmb[i], precision=1))
+    sns.heatmap(MSE, annot=True, ax=ax, xticklabels=x_vals, yticklabels=y_vals, cmap="viridis")
+    #fig, ax = plt.subplots(figsize = (10, 10))
+    #sns.heatmap(MSE, annot=True, ax=ax, cmap="viridis")
     ax.set_title("Mean squared error as a function of the learning rate and hyperparameter")
-    ax.set_xticks(LR)
-    ax.set_yticks(lmb)
+    #ax.set_xticks(LR)
+    #ax.set_yticks(lmb)
     ax.set_xlabel("$\eta$")
     ax.set_ylabel("$\lambda$")
     plt.savefig("HeatMapMSE_REL.pdf", bbox_inches='tight')
@@ -125,6 +132,19 @@ def leaky_relu(x, alpha = 0.1, derivative = False):
 
 def softmax(x, derivative = False):
     if derivative:
-        x * np.exp(x) / np.sum(np.exp(x), keepdims=True)
+        return softmax(x) * (1 - softmax(x))
     else:
         return np.exp(x) / np.sum(np.exp(x), keepdims=True)
+
+def accuracy_score_numpy(Y_test, Y_pred):
+    return np.sum(Y_test == Y_pred) / len(Y_test)
+
+
+
+def to_categorical_numpy(integer_vector):
+    n_inputs = len(integer_vector)
+    n_categories = np.max(integer_vector) + 1
+    onehot_vector = np.zeros((n_inputs, n_categories))
+    onehot_vector[range(n_inputs), integer_vector] = 1
+
+    return onehot_vector

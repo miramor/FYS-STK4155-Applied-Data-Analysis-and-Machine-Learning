@@ -11,10 +11,10 @@ class NeuralNetwork:
             Y_data,
             n_hidden_neurons=[5, 2],
             n_categories=1,
-            epochs=40000,
-            batch_size=10,
-            eta=0.01,
-            lmbd=0,
+            epochs=20000,
+            batch_size=50,
+            eta=0.02,
+            lmbd=0.01,
             activation_function = sigmoid):
 
         self.X_data_full = X_data
@@ -64,8 +64,8 @@ class NeuralNetwork:
             self.a_h[i] = self.act_func(self.z_h[i])
 
         self.z_o = np.matmul(self.a_h[-1], self.output_weights) + self.output_bias
-        #exp_term = np.exp(self.z_o)
-        #self.probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
+        exp_term = np.exp(self.z_o)
+        self.probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
 
     def feed_forward_out(self, X):
         # feed-forward for output
@@ -78,21 +78,16 @@ class NeuralNetwork:
 
         z_o = np.matmul(a_h_out, self.output_weights) + self.output_bias
 
-        #z_h = np.matmul(X, self.hidden_weights) + self.hidden_bias
-        #a_h = sigmoid(z_h)
 
-        #z_o = np.matmul(a_h, self.output_weights) + self.output_bias
-
-        #exp_term = np.exp(z_o)
-        #probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
-        return z_o #probabilities
+        exp_term = np.exp(z_o)
+        probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
+        return probabilities
 
     def backpropagation(self):
-        error_output = self.z_o - self.Y_data.reshape(self.z_o.shape)
+        error_output = self.probabilities - self.Y_data
         error_hidden = [0]*(self.n_layers-2)
         error_hidden[0] = np.matmul(error_output, self.output_weights.T) *  self.act_func(self.z_h[-1], derivative = True) #self.a_h[-1] * (1 - self.a_h[-1])
         for i in range(1, self.n_layers-2):
-            #print(error_hidden[i-1].shape, self.hidden_weights[-i].shape, self.z_h[-i].shape)
             error_hidden[i] = np.matmul(error_hidden[i-1], self.hidden_weights[-i].T) * self.act_func(self.z_h[-i-1], derivative = True)
 
 
@@ -125,8 +120,6 @@ class NeuralNetwork:
         probabilities = self.feed_forward_out(X)
         return probabilities
 
-    def predict_reg(self, X):
-        return self.feed_forward_out(X)
 
     def train(self):
         data_indices = np.arange(self.n_inputs)

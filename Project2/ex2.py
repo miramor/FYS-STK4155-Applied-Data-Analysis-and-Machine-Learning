@@ -4,10 +4,10 @@ from sklearn.model_selection import train_test_split
 import random
 import importlib
 import functions
-import NeuralNetwork
-importlib.reload(functions); importlib.reload(NeuralNetwork)
+import NeuralNetworkReg
+importlib.reload(functions); importlib.reload(NeuralNetworkReg)
 from functions import *
-from NeuralNetwork import *
+from NeuralNetworkReg import *
 
 np.random.seed(2405) # Set a random seed
 
