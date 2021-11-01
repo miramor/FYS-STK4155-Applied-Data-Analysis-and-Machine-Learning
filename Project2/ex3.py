@@ -28,12 +28,32 @@ X=np.hstack((X,temp))
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2) #Split the data into training and test sets
 y_trainhot = to_categorical_numpy(y_train)
 
-NN = NeuralNetwork(X_train, y_trainhot,
-    n_categories = 2, n_hidden_neurons = [50,20,5], activation_function = softmax)
-NN.train()
-y_tilde = NN.predict(X_train)
-y_predict = NN.predict(X_test)
+eta = np.logspace(-3,-1,3)
+n_neurons = np.logspace(0,3,4)
+lmb = 0.01
 
+train_accuracy = np.zeros((len(eta),len(n_neurons)))
+test_accuracy = np.zeros_like(train_accuracy)
 
-print(accuracy_score_numpy(y_tilde, y_train))
-print(accuracy_score_numpy(y_predict, y_test))
+for i,eta_ in enumerate(eta):
+    for j,n_  in enumerate(n_neurons):
+        NN = NeuralNetwork(X_train, y_trainhot, epochs = 200,
+            n_categories = 2, eta = eta_, n_hidden_neurons = [n_,n_], activation_function = sigmoid)
+        NN.train()
+        y_tilde = NN.predict(X_train)
+        y_predict = NN.predict(X_test)
+
+        train_score = accuracy_score_numpy(y_tilde, y_train)
+        test_score = accuracy_score_numpy(y_predict, y_test)
+        train_accuracy[i,j] = train_score
+        test_accuracy[i,j] = test_score
+
+        print(f"Eta: {eta_} | # of neurons: {n_}")
+        print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
+        print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
+        print("------------------------")
+
+make_heatmap(train_accuracy, n_neurons, eta, fn = "train_sigmoid.pdf",
+            xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "Accuracy score training set")
+make_heatmap(test_accuracy, n_neurons, eta, fn = "test_sigmoid.pdf",
+            xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "Accuracy score test set")

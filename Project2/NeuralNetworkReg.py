@@ -11,7 +11,7 @@ class NeuralNetwork:
             Y_data,
             n_hidden_neurons=[5, 2],
             n_categories=1,
-            epochs=10000,
+            epochs=1000,
             batch_size=10,
             eta=0.01,
             lmbd=0,
@@ -92,20 +92,20 @@ class NeuralNetwork:
             error_hidden[i] = np.matmul(error_hidden[i-1], self.hidden_weights[-i].T) * self.act_func(self.z_h[-i-1], derivative = True)
 
 
-        self.hidden_weights_gradient = np.matmul(self.X_data.T, error_hidden[-1]) #+ self.lmbd * self.hidden_weights[0]
+        self.hidden_weights_gradient = np.matmul(self.X_data.T, error_hidden[-1]) + self.lmbd * self.hidden_weights[0]
         self.hidden_weights[0] -= self.eta * self.hidden_weights_gradient
         self.hidden_bias_gradient = np.sum(error_hidden[-1], axis=0)
         self.hidden_bias[0] -= self.eta * self.hidden_bias_gradient
 
         for i in range(1, self.n_layers-2):
-            self.hidden_weights_gradient = np.matmul(self.a_h[i-1].T, error_hidden[-i-1])# + self.lmbd * self.hidden_weights[i]
+            self.hidden_weights_gradient = np.matmul(self.a_h[i-1].T, error_hidden[-i-1]) + self.lmbd * self.hidden_weights[i]
             self.hidden_bias_gradient = np.sum(error_hidden[-i-1], axis=0)
 
             self.hidden_weights[i] -= self.eta * self.hidden_weights_gradient
             self.hidden_bias[i] -= self.eta * self.hidden_bias_gradient
 
 
-        self.output_weights_gradient = np.matmul(self.a_h[-1].T, error_output) #+ self.lmbd * self.output_weights
+        self.output_weights_gradient = np.matmul(self.a_h[-1].T, error_output) + self.lmbd * self.output_weights
         self.output_bias_gradient = np.sum(error_output, axis=0)
         self.output_weights -= self.eta * self.output_weights_gradient
         self.output_bias -= self.eta * self.output_bias_gradient

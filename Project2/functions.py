@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 
 plt.style.use("seaborn")
-#plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 15; plt.rcParams["xtick.labelsize"] = 15; plt.rcParams["ytick.labelsize"] = 15; plt.rcParams["legend.fontsize"] = 15
+plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 15; plt.rcParams["xtick.labelsize"] = 15; plt.rcParams["ytick.labelsize"] = 15; plt.rcParams["legend.fontsize"] = 15
 
 def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
     n = len(X) #number of datapoints
@@ -109,6 +109,21 @@ def plotmseREL(MSE,LR,lmb):
     ax.set_xlabel("$\eta$")
     ax.set_ylabel("$\lambda$")
     plt.savefig("HeatMapMSE_REL.pdf", bbox_inches='tight')
+    plt.show()
+
+def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "" ):
+    fig, ax = plt.subplots()
+    x_vals = []
+    y_vals = []
+    for i in range(len(x)):
+        x_vals.append(np.format_float_scientific(x[i], precision=1))
+    for i in range(len(y)):
+        y_vals.append(np.format_float_scientific(y[i], precision=1))
+    sns.heatmap(z, annot=True, ax=ax, xticklabels=x, yticklabels=y, cmap="viridis")
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    plt.savefig(fn, bbox_inches='tight')
     plt.show()
 
 def sigmoid(x, derivative = False): #sigmoid as activation Function

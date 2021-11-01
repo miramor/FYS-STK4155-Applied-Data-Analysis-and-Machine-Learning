@@ -10,10 +10,10 @@ class NeuralNetwork:
             X_data,
             Y_data,
             n_hidden_neurons=[5, 2],
-            n_categories=1,
-            epochs=20000,
-            batch_size=50,
-            eta=0.02,
+            n_categories=2,
+            epochs=5000,
+            batch_size=100,
+            eta=0.01,
             lmbd=0.01,
             activation_function = sigmoid):
 
@@ -22,7 +22,7 @@ class NeuralNetwork:
 
         self.n_inputs = X_data.shape[0]
         self.n_features = X_data.shape[1]
-        self.n_hidden_neurons = n_hidden_neurons
+        self.n_hidden_neurons = np.array(n_hidden_neurons).astype(int)
         self.n_categories = n_categories
         self.n_layers = len(n_hidden_neurons)+2
 
