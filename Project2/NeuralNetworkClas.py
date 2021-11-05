@@ -84,27 +84,27 @@ class NeuralNetwork:
         return probabilities
 
     def backpropagation(self):
-        error_output = self.probabilities - self.Y_data
+        error_output = (self.probabilities - self.Y_data) #* self.act_func(self.z_o, derivative = True) #
         error_hidden = [0]*(self.n_layers-2)
         error_hidden[0] = np.matmul(error_output, self.output_weights.T) *  self.act_func(self.z_h[-1], derivative = True) #self.a_h[-1] * (1 - self.a_h[-1])
         for i in range(1, self.n_layers-2):
             error_hidden[i] = np.matmul(error_hidden[i-1], self.hidden_weights[-i].T) * self.act_func(self.z_h[-i-1], derivative = True)
 
 
-        self.hidden_weights_gradient = np.matmul(self.X_data.T, error_hidden[-1]) #+ self.lmbd * self.hidden_weights[0]
+        self.hidden_weights_gradient = np.matmul(self.X_data.T, error_hidden[-1]) + self.lmbd * self.hidden_weights[0]
         self.hidden_weights[0] -= self.eta * self.hidden_weights_gradient
         self.hidden_bias_gradient = np.sum(error_hidden[-1], axis=0)
         self.hidden_bias[0] -= self.eta * self.hidden_bias_gradient
 
         for i in range(1, self.n_layers-2):
-            self.hidden_weights_gradient = np.matmul(self.a_h[i-1].T, error_hidden[-i-1])# + self.lmbd * self.hidden_weights[i]
+            self.hidden_weights_gradient = np.matmul(self.a_h[i-1].T, error_hidden[-i-1]) + self.lmbd * self.hidden_weights[i]
             self.hidden_bias_gradient = np.sum(error_hidden[-i-1], axis=0)
 
             self.hidden_weights[i] -= self.eta * self.hidden_weights_gradient
             self.hidden_bias[i] -= self.eta * self.hidden_bias_gradient
 
 
-        self.output_weights_gradient = np.matmul(self.a_h[-1].T, error_output) #+ self.lmbd * self.output_weights
+        self.output_weights_gradient = np.matmul(self.a_h[-1].T, error_output) +  self.lmbd * self.output_weights
         self.output_bias_gradient = np.sum(error_output, axis=0)
         self.output_weights -= self.eta * self.output_weights_gradient
         self.output_bias -= self.eta * self.output_bias_gradient

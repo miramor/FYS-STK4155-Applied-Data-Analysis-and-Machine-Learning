@@ -4,9 +4,10 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.preprocessing import StandardScaler
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
-
+import matplotlib
 plt.style.use("seaborn")
-plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 15; plt.rcParams["xtick.labelsize"] = 15; plt.rcParams["ytick.labelsize"] = 15; plt.rcParams["legend.fontsize"] = 15
+sns.set(font_scale=1.5)
+plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
 def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
     n = len(X) #number of datapoints
@@ -32,6 +33,9 @@ def gradCostOls(X, y, beta): #returns gradient of OLS cost function
     n = len(X)
     return 2/n * X.T @ (X @ beta - y)
 
+def gradcostMSE(y_model, y): #returns gradient of OLS cost function
+    n = len(y_model)
+    return -2/n * y_model * (y_model - y)
 
 
 def learningSchedule(t): #Returns learning rate eta
@@ -163,3 +167,43 @@ def to_categorical_numpy(integer_vector):
     onehot_vector[range(n_inputs), integer_vector] = 1
 
     return onehot_vector
+
+
+def predict_logistic(x, coef):
+    if len(x) == 1:
+        y_pred = coef[0]
+        for j in range(len(x[0])-1):
+            y_pred += coef[j+1]*x[0][j]
+        if y_pred < -500:
+            return 0
+        elif y_pred > 500:
+            return 1
+        else:
+            return 1/(1+np.exp(-y_pred))
+    else:
+        pred = []
+        print(x)
+        for i in range(len(x)):
+            print(x[i])
+            pred.append(round(predict_logistic([x[i]], coef)))
+        return pred
+
+
+def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
+    n = len(X_train) #number of datapoints
+    m = int(n/M) #number of mini-batch cycles (M: size of batch)
+    n_coef = len(X_train[0]) + 1
+    coef = [0]*n_coef
+    for e in range(n_epochs):
+        s_error = 0
+        for i in range(m):
+            random_index = np.random.randint(m)
+            xi = X_train[random_index:random_index+1][0]
+            yi = y_train[random_index:random_index+1][0]
+            y_pred = predict_logistic([xi], coef)
+            error = y_pred - yi
+            s_error += error**2
+            coef[0] = coef[0] - learn_rate*error
+            for j in range(1,n_coef):
+                coef[j] = coef[j] - learn_rate*(error*xi[j-1]+lmb*coef[j])
+    return coef

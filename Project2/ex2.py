@@ -8,8 +8,8 @@ import NeuralNetworkReg
 importlib.reload(functions); importlib.reload(NeuralNetworkReg)
 from functions import *
 from NeuralNetworkReg import *
+from imageio import imread
 
-np.random.seed(2405) # Set a random seed
 
 N = 100 #number of datapoints
 d = 5 #complexity
@@ -19,85 +19,50 @@ y = FrankeFunction(x1,x2)
 X = createX(x1,x2,d)
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2) #Split the data into training and test sets
 
-
-
-n_features= X_train.shape[1] #numer of features
-n_hidden_neurons = 10 # number of hidden neurons
-n_outputs = 80
-#initialise weights and bias
-#hidden layer
-hidden_weights = np.random.randn(n_features, n_hidden_neurons)
-bias = 0.01
-hidden_bias = np.zeros(n_hidden_neurons) + bias
-
-#output layer
-output_weights = np.random.randn(n_hidden_neurons, 1)
-output_bias = np.zeros(1) + bias
-
-
-def feed_forward(X): #feed-forward pass
-    z_h = np.matmul(X, hidden_weights) + hidden_bias # weighted sum of inputs to the hidden layer
-    a_h = sigmoid(z_h) # activation in the hidden layer
-    # weighted sum of inputs to the output layer
-    z_o = np.matmul(a_h, output_weights) + output_bias
-    y_output= sigmoid(z_o)
-
-    return a_h, y_output
-
-
-def backpropagation(X, y):
-    a_h, y_output = feed_forward(X)
-    #error in output layer
-    error_output = y_output - y.reshape(y_output.shape)
-    #error in hidden layer
-
-    error_hidden = error_output @ output_weights.T * a_h * (1 - a_h)
-
-    # gradients for the output layer
-    output_weights_gradient = np.matmul(a_h.T, error_output)
-    output_bias_gradient = np.sum(error_output, axis=0)
-
-    # gradient for the hidden layer
-    hidden_weights_gradient = np.matmul(X.T, error_hidden)
-    hidden_bias_gradient = np.sum(error_hidden, axis=0)
-
-    return output_weights_gradient, output_bias_gradient, hidden_weights_gradient, hidden_bias_gradient
-
-"""
-lmbd = 0.01
-eta = 0.01
-for i in range(20000):
-
-    dWo, dBo, dWh, dBh = backpropagation(X_train, y_train)
-
-    # regularization term gradients
-    dWo += lmbd * output_weights
-    dWh += lmbd * hidden_weights
-
-    # update weights and biases
-    output_weights -= eta * dWo
-    output_bias -= eta * dBo
-    hidden_weights -= eta * dWh
-    hidden_bias -= eta * dBh
-
-#print(output_weights)
-a_0, y_tilde = feed_forward(X_train)
-a_o, y_predict = feed_forward(X_test)
-"""
 betaOLS = ols(X_train, y_train)
 y_tildeOLS = predict(X_train, betaOLS)
 y_predictOLS = predict(X_test, betaOLS)
 
-#print(f"MSE Test FFNN: {mse(y_test, y_predict[0,:])}")
-#print(f"MSE Test OLS: {mse(y_test, y_predictOLS)}")
+eta = np.logspace(-4,-2,3)
+n_neurons = np.logspace(0,2,3)
+n_neurons = np.array([1,5,10,15,20,25,30])
+lmb = 0.01
+mse_train = np.zeros((len(eta), len(n_neurons)))
+mse_test = np.zeros((len(eta), len(n_neurons)))
+
+actfunc = {
+    "sigmoid": sigmoid,
+    "softmax": softmax,
+    "relu": relu,
+    "leaky_relu": leaky_relu
+}
+af = "relu"
+
+for i,eta_ in enumerate(eta):
+    for j,n_  in enumerate(n_neurons):
+        NN = NeuralNetwork(X_train, y_train, epochs = 2000, batch_size = 80,
+            n_categories = 1, eta = eta_, lmbd = lmb, n_hidden_neurons = [n_], activation_function = actfunc[af])
+        NN.train()
+        y_tilde = NN.predict_reg(X_train)
+        y_predict = NN.predict_reg(X_test)
+
+        mse_train_ = mse(y_train.reshape(y_tilde.shape), y_tilde)
+        mse_test_ = mse(y_test.reshape(y_predict.shape), y_predict)
+
+        mse_train[i,j] = mse_train_
+        mse_test[i,j] = mse_test_
+
+        print(f"Eta: {eta_} | # of neurons: {n_}")
+        print(f"Training MSE: {mse_train_}")
+        print(f"Test MSE: {mse_test_}")
+        print("------------------------")
+
+make_heatmap(mse_train, n_neurons, eta, fn = f"train_{af}.pdf",
+            xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "MSE training set")
+make_heatmap(mse_test, n_neurons, eta, fn = f"test_{af}.pdf",
+            xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "MSE test set")
 
 
-FFNN = NeuralNetwork(X_train, y_train, activation_function = leaky_relu)
-FFNN.train()
-y_tilde = FFNN.predict_reg(X_train)
-y_predict = FFNN.predict_reg(X_test)
-print(f"MSE Train FFNN: {mse(y_train.reshape(y_tilde.shape), y_tilde)}")
+
 print(f"MSE Train OLS: {mse(y_train, y_tildeOLS)}")
-
-print(f"MSE Test FFNN: {mse(y_test, y_predict[0,:])}")
 print(f"MSE Test OLS: {mse(y_test, y_predictOLS)}")

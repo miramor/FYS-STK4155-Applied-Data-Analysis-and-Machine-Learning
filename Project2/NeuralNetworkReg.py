@@ -9,13 +9,14 @@ class NeuralNetwork:
             self,
             X_data,
             Y_data,
-            n_hidden_neurons=[5, 2],
+            n_hidden_neurons=[20, 20],
             n_categories=1,
             epochs=1000,
             batch_size=10,
             eta=0.01,
             lmbd=0,
-            activation_function = sigmoid):
+            activation_function = sigmoid,
+            gradCostFunc = gradcostMSE):
 
         self.X_data_full = X_data
         self.Y_data_full = Y_data
@@ -38,7 +39,7 @@ class NeuralNetwork:
         self.create_biases_and_weights()
 
         self.act_func = activation_function
-
+        self.gradCostFunc = gradCostFunc
 
 
     def create_biases_and_weights(self):
@@ -54,6 +55,7 @@ class NeuralNetwork:
         self.output_weights = np.random.randn(self.n_hidden_neurons[-1], self.n_categories)
         self.output_bias = np.zeros(self.n_categories) + 0.01
 
+
     def feed_forward(self):
         # feed-forward for training
 
@@ -64,6 +66,7 @@ class NeuralNetwork:
             self.a_h[i] = self.act_func(self.z_h[i])
 
         self.z_o = np.matmul(self.a_h[-1], self.output_weights) + self.output_bias
+
         #exp_term = np.exp(self.z_o)
         #self.probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
 
@@ -84,7 +87,9 @@ class NeuralNetwork:
         return z_o #probabilities
 
     def backpropagation(self):
-        error_output = self.z_o - self.Y_data.reshape(self.z_o.shape)
+        error_output = (self.z_o - self.Y_data.reshape(self.z_o.shape))# * self.act_func(self.z_o, derivative = True)
+        #error_output = self.gradCostFunc(self.z_o, self.Y_data.reshape(self.z_o.shape))
+
         error_hidden = [0]*(self.n_layers-2)
         error_hidden[0] = np.matmul(error_output, self.output_weights.T) *  self.act_func(self.z_h[-1], derivative = True) #self.a_h[-1] * (1 - self.a_h[-1])
         for i in range(1, self.n_layers-2):
@@ -104,9 +109,10 @@ class NeuralNetwork:
             self.hidden_weights[i] -= self.eta * self.hidden_weights_gradient
             self.hidden_bias[i] -= self.eta * self.hidden_bias_gradient
 
-
+        #print(self.a_h[-1].shape, error_output.shape)
         self.output_weights_gradient = np.matmul(self.a_h[-1].T, error_output) + self.lmbd * self.output_weights
         self.output_bias_gradient = np.sum(error_output, axis=0)
+
         self.output_weights -= self.eta * self.output_weights_gradient
         self.output_bias -= self.eta * self.output_bias_gradient
 
