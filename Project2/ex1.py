@@ -1,6 +1,8 @@
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 import random
 import importlib
 import functions
@@ -11,9 +13,12 @@ np.random.seed(2405) # Set a random seed
 
 N = 500 #number of datapoints
 d = 5 #complexity
-M = 100
-epochs = 5000
+print("d:", d)
+M = 250
+epochs = 8000
 eta = 0.1
+scale = False
+print("scale", scale)
 x1 = np.random.uniform(0,1,N)
 x2 = np.random.uniform(0,1,N)
 y = FrankeFunction(x1,x2)
@@ -21,9 +26,25 @@ X = createX(x1,x2,d)
 
 tts = train_test_split(X,y,test_size=0.2) #Split the data into training and test sets
 theta = np.random.randn(len(X[0])) #first guess of beta
+#print(tts)
+"""
+if scale: #scala data
+    scaler = StandardScaler()
+    scaler.fit(tts[0])
+    tts[0] = scaler.transform(tts[0])
+    tts[1] = scaler.transform(tts[1])
+    scaler2 = StandardScaler()
+    scaler2.fit(tts[2].reshape(-1,1))
+    tts[2] = scaler2.transform(tts[2].reshape(-1,1))
+    tts[3] = scaler2.transform(tts[3].reshape(-1,1))
+    for i in range(2,4):
+       tts[i] = tts[i].flatten()
+"""
+
 betaOLS1 = SGD(tts[0], tts[2], M=M, epochs = epochs, beta = theta, gradCostFunc = gradCostOls, eta = eta)
 betaOLS2 = ols(tts[0], tts[2]) #regular OLS regression
 betaSKOLS = SklearnSGD(tts[0], tts[2], penalty = None, eta = eta, epochs=epochs)
+
 
 lmb = 0.0004
 betaRidge1 = SGD(tts[0], tts[2], M=M, epochs = epochs, beta = theta, gradCostFunc = gradCostRidge, eta = eta, lmb = lmb)
@@ -49,12 +70,14 @@ y_predictRidge2 = predict(tts[1],betaRidge2)
 y_predictSKRidge = predict(tts[1],betaSKRidge)
 
 #y_predictRidge = predict(tts[0],beta2)
-print(mse(tts[2],y_tildeOLS1), mse(tts[2],y_tildeSKOLS))
-print(mse(tts[2],y_tildeRidge1), mse(tts[2],y_tildeSKRidge))
-
-print(mse(tts[3],y_predictOLS1), mse(tts[3],y_predictSKOLS))
-print(mse(tts[3],y_predictRidge1), mse(tts[3],y_predictSKRidge))
-
+print(f"epochs={epochs}, M={M}")
+print("MSE train")
+print(f"OLS {mse(tts[2],y_tildeOLS1)}, Sklearn={mse(tts[2],y_tildeSKOLS)}")
+print(f"Ridge {mse(tts[2],y_tildeRidge1)}, Sklearn={mse(tts[2],y_tildeSKRidge)}")
+print("MSE test")
+print(f"OLS {mse(tts[3],y_predictOLS1)}, Sklearn={mse(tts[3],y_predictSKOLS)}")
+print(f"Ridge {mse(tts[3],y_predictRidge1)}, Sklearn={mse(tts[3],y_predictSKRidge)}")
+sys.exit()
 epochsL = np.arange(5000,10001,1000)
 nbatches = [1, 5, 20, 50, 100,250]
 MSE_train_OLS = np.zeros((len(epochsL), len(nbatches)))
@@ -100,6 +123,11 @@ for i in range(len(etaL)):
     MSE_test_OLSeta[i] = mse(tts[3],ypredict)
     print(f"{int((i+1)/len(etaL)*100)} % done")
 plotmseLR(MSE_test_OLSeta, etaL)
+eta_opt = etaL[np.argmin(MSE_test_OLSeta)] #optimal eta value
+print(f"Minimal MSE test for SGD: {np.min(MSE_test_OLSeta)}, eta={eta_opt}")
+betaSKOLS = SklearnSGD(tts[0], tts[2], penalty = None, eta = eta_opt, epochs=optimal_epoch_test)
+y_predictSKOLS = predict(tts[1],betaSKOLS)
+print(f"Sklearn MSE test: {mse(tts[3],y_predictSKOLS)}")
 """
 #Ridge
 MSE_train_Ridge = np.zeros((len(epochsL), len(nbatches)))
@@ -129,7 +157,8 @@ print(f"Optimal mini batches train {optimal_batch_train}")
 print(f"Optimal mini batches test {optimal_batch_test}")
 
 etaLRid = np.logspace(-2,-0.8,20)
-lambdaL = np.logspace(-4,-1,20)
+etaLRid = np.logspace(-2,-0.8,10)
+lambdaL = np.logspace(-4,-5,10)
 MSE_train_REL = np.zeros((len(etaLRid), len(lambdaL))) #Ridge Eta Lambda
 MSE_test_REL = np.zeros((len(etaLRid), len(lambdaL)))
 
@@ -145,4 +174,6 @@ for i in range(len(etaLRid)):
     print(f"{int((i+1)/len(etaLRid)*100)} % done")
 
 
-plotmseREL(MSE_test_REL, etaLRid, lambdaL)
+plotmseREL(MSE_test_REL[::2,::2], etaLRid[::2], lambdaL[::2])
+print(f"Min MSE_test {np.min(MSE_test_REL)}" )
+#make_heatmap(MSE_test_REL, etaLRid, lambdal)

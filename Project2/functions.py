@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 
 plt.style.use("seaborn")
-plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 15; plt.rcParams["xtick.labelsize"] = 15; plt.rcParams["ytick.labelsize"] = 15; plt.rcParams["legend.fontsize"] = 15
+plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
 def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
     n = len(X) #number of datapoints
@@ -87,9 +87,9 @@ def SklearnSGD(X, y, epochs, penalty, eta, alpha = 0):
 
 def plotmseLR(MSE, LR):
     plt.plot(LR, MSE)
-    plt.title("Mean squared error as a funciton of the learning rate")
+    plt.title("Mean squared error as a function of the learning rate")
     plt.xlabel("$\eta$")
-    plt.ylabel("MSE")
+    plt.ylabel("$MSE_{Test}$")
     plt.savefig("MSELearningRate.pdf", bbox_inches='tight')
     plt.show()
 
