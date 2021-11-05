@@ -176,4 +176,5 @@ for i in range(len(etaLRid)):
 
 plotmseREL(MSE_test_REL[::2,::2], etaLRid[::2], lambdaL[::2])
 print(f"Min MSE_test {np.min(MSE_test_REL)}" )
+np.argmin(MSE_test_REL)
 #make_heatmap(MSE_test_REL, etaLRid, lambdal)
