@@ -4,11 +4,11 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.preprocessing import StandardScaler
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
-
+np.random.seed(2405) # Set a random seed
 plt.style.use("seaborn")
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
-def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
+def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None, LS=False): #Stochastic Gradient Descent
     n = len(X) #number of datapoints
     m = int(n/M) #number of mini-batch cycles (M: size of batch)
     for epoch in range(epochs):
@@ -20,7 +20,8 @@ def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradi
                 gradients = gradCostFunc(xi, yi, beta)
             else:
                 gradients = gradCostFunc(xi, yi, beta, lmb)
-            #eta = learningSchedule(epoch*m+i)
+            if LS:
+                eta = learningSchedule(epoch*m+i)
             beta = beta - eta*gradients
     return beta
 
@@ -79,36 +80,41 @@ def ols(X, y): #Finds optimal beta for the Ordinary Least Squares method
 def ridge(X, y, lmb): #Finds optimal beta for Ridge
     return np.linalg.pinv(X.T @ X + lmb*np.identity(X.shape[1])) @ X.T @ y
 
-def SklearnSGD(X, y, epochs, penalty, eta, alpha = 0):
+def SklearnSGD(X, y, epochs, penalty, eta, alpha = 0, tol=1e-4):
     sgdreg = SGDRegressor(max_iter=epochs, penalty = penalty,
-                          eta0 = eta, learning_rate = 'constant', alpha = alpha, fit_intercept = False)
+                          eta0 = eta, learning_rate = 'constant', alpha = alpha, fit_intercept = False, tol=tol)
     sgdreg.fit(X, y)
     return sgdreg.coef_
 
-def plotmseLR(MSE, LR):
+def plotmseLR(MSE, LR, LS=False):
     plt.plot(LR, MSE)
     plt.title("Mean squared error as a function of the learning rate")
     plt.xlabel("$\eta$")
     plt.ylabel("$MSE_{Test}$")
-    plt.savefig("MSELearningRate.pdf", bbox_inches='tight')
+    if LS:
+        fn = "MSELearningRate_LS.pdf"
+    else:
+        fn ="MSELearningRate.pdf"
+    plt.savefig(fn, bbox_inches='tight')
     plt.show()
 
-def plotmseREL(MSE,LR,lmb):
+def plotmseREL(MSE,x,y, LS=False):
     fig, ax = plt.subplots()
     x_vals = []
     y_vals = []
-    for i in range(len(LR)):
-        x_vals.append(np.format_float_scientific(LR[i], precision=1))
-        y_vals.append(np.format_float_scientific(lmb[i], precision=1))
+    for i in range(len(x)):
+        x_vals.append(np.format_float_scientific(x[i], precision=1))
+    for i in range(len(y)):
+        y_vals.append(np.format_float_scientific(y[i], precision=1))
     sns.heatmap(MSE, annot=True, ax=ax, xticklabels=x_vals, yticklabels=y_vals, cmap="viridis")
-    #fig, ax = plt.subplots(figsize = (10, 10))
-    #sns.heatmap(MSE, annot=True, ax=ax, cmap="viridis")
     ax.set_title("Mean squared error as a function of the learning rate and hyperparameter")
-    #ax.set_xticks(LR)
-    #ax.set_yticks(lmb)
-    ax.set_xlabel("$\eta$")
-    ax.set_ylabel("$\lambda$")
-    plt.savefig("HeatMapMSE_REL.pdf", bbox_inches='tight')
+    ax.set_xlabel("$\lambda$")
+    ax.set_ylabel("$\eta$")
+    if LS:
+        fn = "HeatMapMSE_REL_LS.pdf"
+    else:
+        fn ="HeatMapMSE_REL.pdf"
+    plt.savefig(fn, bbox_inches='tight')
     plt.show()
 
 def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "" ):
