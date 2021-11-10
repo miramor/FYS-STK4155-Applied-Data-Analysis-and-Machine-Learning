@@ -28,16 +28,15 @@ betaOLS2 = ols(tts[0], tts[2]) #regular OLS regression
 y_tildeOLS2 = predict(tts[0],betaOLS2) #regular OLS regression
 y_predictOLS2 = predict(tts[1],betaOLS2)
 
-OLS = True
-Ridge = False
-learnSced = True #learning schedule
 #OLS
-if OLS:
+def SGDSearch_OLS(learnSced=False):
     epochsL = np.arange(5000,10001,1000)
     nbatches = [1, 5, 20, 50, 100,250]
     etaL = np.logspace(-2,-0.8,10)
     MSE_train_OLS = np.zeros((len(epochsL), len(nbatches)))
     MSE_test_OLS = np.zeros((len(epochsL), len(nbatches)))
+
+
 
     print("Start epoch loop OLS")
     for i in range(len(epochsL)):
@@ -49,7 +48,8 @@ if OLS:
             MSE_test_OLS[i, j] = mse(tts[3],ypredict)
 
         print(f"{int((i+1)/len(epochsL)*100)} % done")
-
+    make_heatmap(MSE_test_OLS, nbatches, epochsL)
+    #sys.exit()
     minMSE_OLS_train_index = np.argwhere(MSE_train_OLS == np.min(MSE_train_OLS))[0]
     minMSE_OLS_test_index = np.argwhere(MSE_test_OLS == np.min(MSE_test_OLS))[0]
 
@@ -77,6 +77,7 @@ if OLS:
         print(f"{int((i+1)/len(etaL)*100)} % done")
     print("\n")
     print(f"Results for epochs = {optimal_epoch_test}, mini batch = {optimal_batch_test} and learning schedule = {learnSced}")
+
     plotmseLR(MSE_test_OLSeta, etaL, LS=learnSced)
 
     eta_trainO =etaL[np.argmin(MSE_train_OLSeta)]
@@ -95,7 +96,7 @@ if OLS:
     print(f"MSE test Sklearn : {mse(tts[3],y_predictSKOLS)}, eta={eta_testO}")
     print(f"MSE test Regular OLS: {mse(tts[3],y_predictOLS2)}")
 
-if Ridge:
+def SGDSearch_Ridge(learnSced=False):
     epochsL = np.arange(2000,6000,1000)
     nbatches = [1, 5, 20, 50, 100]
     #etaLRid = np.logspace(-3,-1,4)
@@ -115,7 +116,7 @@ if Ridge:
             MSE_test_Ridge[i, j] = mse(tts[3],ypredict)
 
         print(f"{int((i+1)/len(epochsL)*100)} % done")
-
+    make_heatmap(MSE_test_Ridge, nbatches, epochsL)
     minMSE_Ridge_train_index = np.argwhere(MSE_train_Ridge == np.min(MSE_train_Ridge))[0]
     minMSE_Ridge_test_index = np.argwhere(MSE_test_Ridge == np.min(MSE_test_Ridge))[0]
 
@@ -169,4 +170,9 @@ if Ridge:
     print(f"MSE test SGD: {np.min(MSE_test_REL)}, eta={etaRid_testO}, lmb={lmbTest}")
     print(f"MSE test Sklearn : {mse(tts[3],y_predictSKRid)}, eta={etaRid_testO}, lmb={lmbTest}")
     print(f"MSE test Regular Ridge: {mse(tts[3],y_predictRidge2)}")
+
+#SGDSearch_OLS(learnSced=False)
+#SGDSearch_OLS(learnSced=True)
+SGDSearch_Ridge(learnSced=False)
+#SGDSearch_Ridge(learnSced=True)
 #SklearnSGD følsom bedre når eta = 0.1

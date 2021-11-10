@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 np.random.seed(2405) # Set a random seed
 plt.style.use("seaborn")
-plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 18; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
+plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
 def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None, LS=False): #Stochastic Gradient Descent
     n = len(X) #number of datapoints
@@ -36,7 +36,7 @@ def gradCostOls(X, y, beta): #returns gradient of OLS cost function
 
 
 def learningSchedule(t): #Returns learning rate eta
-    t0, t1 = 5, 50
+    t0, t1 = 5, 100
     return t0/(t+t1)
 
 def mse(y, y_model): #Calculates the MSE for a model
