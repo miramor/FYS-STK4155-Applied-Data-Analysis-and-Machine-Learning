@@ -28,11 +28,12 @@ X=np.hstack((X,temp))
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2) #Split the data into training and test sets
 y_trainhot = to_categorical_numpy(y_train)
 
-eta = np.logspace(-4,-3,2)
+eta = np.logspace(-4,-2,3)
 n_neurons = np.logspace(0,2,3)
 n_neurons = np.array([10,25,50,75,100,125])
-lmb = 0.001
-n_hl = 2
+lmb = 0
+print(f"Lambda = {lmb}")
+n_hl = 3
 actfunc = {
 "sigmoid": sigmoid,
 "softmax": softmax,
@@ -45,7 +46,7 @@ train_accuracy = np.zeros((len(eta),len(n_neurons)))
 test_accuracy = np.zeros_like(train_accuracy)
 for i,eta_ in enumerate(eta):
     for j,n_  in enumerate(n_neurons):
-        NN = NeuralNetwork(X_train, y_trainhot, epochs = 100, batch_size = 25,
+        NN = NeuralNetwork(X_train, y_trainhot, epochs = 2000, batch_size = 25,
             n_categories = 2, eta = eta_, lmbd = lmb, n_hidden_neurons = [n_]*n_hl, activation_function = actfunc[af])
         NN.train()
         y_tilde = NN.predict(X_train)

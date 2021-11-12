@@ -12,21 +12,25 @@ from imageio import imread
 
 
 N = 100 #number of datapoints
-d = 5 #complexity
+d = 1
 x1 = np.random.uniform(0,1,N)
 x2 = np.random.uniform(0,1,N)
 y = FrankeFunction(x1,x2)
+noise = np.random.normal(0, 1, size=(y.shape)) #Find random noise
+y_noisy =  FrankeFunction(x1,x2) + noise*0.2
 X = createX(x1,x2,d)
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2) #Split the data into training and test sets
+X_ols  = createX(x1,x2,5)
+X_train, X_test, y_train, y_test = train_test_split(X,y_noisy,test_size=0.2) #Split the data into training and test sets
+X_train_ols, X_test_ols, y_train_ols, y_test_ols = train_test_split(X,y_noisy, test_size=0.2)
 
-betaOLS = ols(X_train, y_train)
+betaOLS = ols(X_train_ols, y_train_ols)
 y_tildeOLS = predict(X_train, betaOLS)
 y_predictOLS = predict(X_test, betaOLS)
 
-eta = np.logspace(-4,-2,3)
+eta = np.logspace(-5,-3,3)
 n_neurons = np.logspace(0,2,3)
-n_neurons = np.array([1,5,10,15,20,25,30])
-lmb = 0.01
+n_neurons = np.array([1,5,7,10,12,15,20])
+lmb = 0.001
 mse_train = np.zeros((len(eta), len(n_neurons)))
 mse_test = np.zeros((len(eta), len(n_neurons)))
 
@@ -36,7 +40,7 @@ actfunc = {
     "relu": relu,
     "leaky_relu": leaky_relu
 }
-af = "relu"
+af = "leaky_relu"
 
 for i,eta_ in enumerate(eta):
     for j,n_  in enumerate(n_neurons):

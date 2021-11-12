@@ -182,7 +182,6 @@ def predict_logistic(x, coef):
             return 1/(1+np.exp(-y_pred))
     else:
         pred = []
-        print(x)
         for i in range(len(x)):
             print(x[i])
             pred.append(round(predict_logistic([x[i]], coef)))
