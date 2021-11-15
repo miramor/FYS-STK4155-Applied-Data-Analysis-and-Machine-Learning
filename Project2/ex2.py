@@ -12,7 +12,7 @@ from NeuralNetworkReg import *
 np.random.seed(2405) # Set a random seed
 
 N = 100 #number of datapoints
-d = 5 #complexity
+d = 1 #complexity
 x1 = np.random.uniform(0,1,N)
 x2 = np.random.uniform(0,1,N)
 y = FrankeFunction(x1,x2)

@@ -8,9 +8,11 @@ np.random.seed(2405) # Set a random seed
 plt.style.use("seaborn")
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
-def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None, LS=False): #Stochastic Gradient Descent
+def SGD(X, y, M, epochs, gradCostFunc, beta, eta, gamma = 0, lmb = None, LS=False): #Stochastic Gradient Descent
     n = len(X) #number of datapoints
     m = int(n/M) #number of mini-batch cycles (M: size of batch)
+    v_prev = 0
+    betaL = []
     for epoch in range(epochs):
         for i in range(m):
             random_index = np.random.randint(m)
@@ -22,8 +24,21 @@ def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None, LS=False): #Stocha
                 gradients = gradCostFunc(xi, yi, beta, lmb)
             if LS:
                 eta = learningSchedule(epoch*m+i)
-            beta = beta - eta*gradients
-    return beta
+
+            v = gamma * v_prev + eta*gradients
+            beta = beta - v
+            v_prev = v
+            if i == 0 and epoch == 0:
+                print(eta)
+        betaL.append(beta)
+
+            #beta = beta - eta*gradients
+
+    try:
+        return beta, np.array(betaL)
+
+    except:
+        return beta
 
 def gradCostRidge(X, y, beta, lmb): #returns gradient of Ridge cost function
     n = len(X)
@@ -35,9 +50,9 @@ def gradCostOls(X, y, beta): #returns gradient of OLS cost function
 
 
 
-def learningSchedule(t): #Returns learning rate eta
-    t0, t1 = 5, 100
+def learningSchedule(t, t0=5, t1=100): #Returns learning rate eta
     return t0/(t+t1)
+
 
 def mse(y, y_model): #Calculates the MSE for a model
     n = len(y)
@@ -117,7 +132,7 @@ def plotmseREL(MSE,x,y, LS=False):
     plt.savefig(fn, bbox_inches='tight')
     plt.show()
 
-def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "" ):
+def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "", with_precision=False):
     fig, ax = plt.subplots()
     x_vals = []
     y_vals = []
@@ -125,7 +140,10 @@ def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylab
         x_vals.append(np.format_float_scientific(x[i], precision=1))
     for i in range(len(y)):
         y_vals.append(np.format_float_scientific(y[i], precision=1))
-    sns.heatmap(z, annot=True, ax=ax, xticklabels=x, yticklabels=y, cmap="viridis")
+    if with_precision:
+        sns.heatmap(z, annot=True, ax=ax, xticklabels=x_vals, yticklabels=y_vals, cmap="viridis")
+    else:
+        sns.heatmap(z, annot=True, ax=ax, xticklabels=x, yticklabels=y, cmap="viridis")
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
