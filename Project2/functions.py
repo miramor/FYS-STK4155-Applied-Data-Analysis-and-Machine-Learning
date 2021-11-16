@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import matplotlib
+from NeuralNetworkReg import NeuralNetwork
 plt.style.use("seaborn")
 sns.set(font_scale=1.5)
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
@@ -116,6 +117,7 @@ def plotmseREL(MSE,LR,lmb):
     plt.show()
 
 def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "" ):
+    plt.clf()
     fig, ax = plt.subplots()
     x_vals = []
     y_vals = []
@@ -206,3 +208,36 @@ def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
             for j in range(1,n_coef):
                 coef[j] = coef[j] - learn_rate*(error*xi[j-1]+lmb*coef[j])
     return coef
+
+
+def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in logistic regression,  X = X_train, z = z_train
+    mse_test = np.zeros(k) #for storing kfold samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
+    mse_train = np.zeros(k)
+    r2_test = np.zeros(k)
+    r2_train = np.zeros(k)
+    n = len(X)
+    split = int(n/k) #Size of the folds
+    mse2 = 0
+    
+    for j in range(k): #Splits into training and test set
+        if j == k-1:
+            X_train = X[:j*split]
+            X_test = X[j*split:]
+            y_train = y[:j*split]
+            y_test = y[j*split:]
+        else:
+            X_train = np.concatenate((X[:(j)*split], X[(j+1)*split:]), axis = 0)
+            X_test = X[j*split:(j+1)*split]
+            y_train = np.concatenate((y[:(j)*split], y[(j+1)*split:]))
+            y_test = y[j*split:(j+1)*split]
+
+
+        NN = NeuralNetwork(X_train, y_train, epochs = 3000, batch_size = 50,
+            n_categories = 1, eta = eta, lmbd = lmb, n_hidden_neurons = [10,10], activation_function = actfunc)
+        NN.train()
+        y_tilde = NN.predict_reg(X_train)
+        y_predict = NN.predict_reg(X_test)
+        mse2 += mse(y_test.reshape(y_predict.shape), y_predict)
+
+
+    return mse2/k
