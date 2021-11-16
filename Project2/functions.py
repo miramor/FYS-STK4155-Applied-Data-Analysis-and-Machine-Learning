@@ -28,17 +28,13 @@ def SGD(X, y, M, epochs, gradCostFunc, beta, eta, gamma = 0, lmb = None, LS=Fals
             v = gamma * v_prev + eta*gradients
             beta = beta - v
             v_prev = v
-            if i == 0 and epoch == 0:
-                print(eta)
         betaL.append(beta)
 
             #beta = beta - eta*gradients
 
-    try:
-        return beta, np.array(betaL)
 
-    except:
-        return beta
+    return beta, np.array(betaL)
+
 
 def gradCostRidge(X, y, beta, lmb): #returns gradient of Ridge cost function
     n = len(X)

@@ -20,31 +20,30 @@ noise = np.random.normal(0, 1, size=(y.shape)) #Find random noise
 y_noisy =  FrankeFunction(x1,x2) + noise*0.2
 X = createX(x1,x2,d)
 
-
 tts = train_test_split(X,y_noisy,test_size=0.2) #Split the data into training and test sets
 theta = np.random.randn(len(X[0])) #first guess of beta
-scale = False
-if scale: #scala data
-    tts[0] =tts[0][:,1:]
-    tts[1] =tts[1][:,1:]
-    theta = np.random.randn(len(tts[0][0])) #first guess of beta
-    scaler = StandardScaler(with_std=False)
-    scaler.fit(tts[0])
-    tts[0] = scaler.transform(tts[0])
-    tts[1] = scaler.transform(tts[1])
-    scaler2 = StandardScaler(with_std=False)
-    scaler2.fit(tts[2].reshape(-1,1))
-    tts[2] = scaler2.transform(tts[2].reshape(-1,1))
-    tts[3] = scaler2.transform(tts[3].reshape(-1,1))
-    tts[2] =tts[2].flatten()
-    tts[3] =tts[3].flatten()
 #Regular OLS Regression
 betaOLS2 = ols(tts[0], tts[2]) #regular OLS regression
 y_tildeOLS2 = predict(tts[0],betaOLS2) #regular OLS regression
 y_predictOLS2 = predict(tts[1],betaOLS2)
 
 #OLS
-def SGDSearch_OLS(learnSced=False, gamma = 0, epochs = 1000):
+def SGDSearch_OLS(tts, theta, learnSced=False, gamma = 0, epochs = 1000, scale = False):
+    if scale: #scala data
+        tts[0] =tts[0][:,1:]
+        tts[1] =tts[1][:,1:]
+        theta = np.random.randn(len(tts[0][0])) #first guess of beta
+        scaler = StandardScaler(with_std=False)
+        scaler.fit(tts[0])
+        tts[0] = scaler.transform(tts[0])
+        tts[1] = scaler.transform(tts[1])
+        scaler2 = StandardScaler(with_std=False)
+        scaler2.fit(tts[2].reshape(-1,1))
+        tts[2] = scaler2.transform(tts[2].reshape(-1,1))
+        tts[3] = scaler2.transform(tts[3].reshape(-1,1))
+        tts[2] =tts[2].flatten()
+        tts[3] =tts[3].flatten()
+
     nbatches = [1, 5, 20, 50, 100,250]
     etaL = np.logspace(-5,-1,5)
     MSE_train_OLS = np.zeros((len(etaL), len(nbatches)))
@@ -61,7 +60,7 @@ def SGDSearch_OLS(learnSced=False, gamma = 0, epochs = 1000):
             MSE_test_OLS[i, j] = mse(tts[3],ypredict)
 
         print(f"{int((i+1)/len(etaL)*100)} % done")
-    make_heatmap(MSE_test_OLS, nbatches, etaL, fn = f"ex1_hm_ols_{epochs}.pdf", title = "MSE as a function different hyperparameters", xlabel = "Number of mini batches", ylabel = "$\eta$")
+    make_heatmap(MSE_test_OLS, nbatches, etaL, fn = f"ex1_hm_ols_{epochs}_sc{1 if scale else 0}.pdf", title = "MSE as a function different hyperparameters", xlabel = "Number of mini batches", ylabel = "$\eta$")
     #args = np.argmin(MSE_test_OLS,axis=2)
     #MSE_test_OLS = np.min(MSE_test_OLS,axis=2)
     #MSE_train_OLS = MSE_train_OLS[:,:,args]
@@ -93,7 +92,22 @@ def SGDSearch_OLS(learnSced=False, gamma = 0, epochs = 1000):
     print(f"MSE test Sklearn : {mse(tts[3],y_predictSKOLS)}, eta={optimal_eta_test}")
     print(f"MSE test Regular OLS: {mse(tts[3],y_predictOLS2)}")
 
-def SGDSearch_Ridge(learnSced=False, gamma = 0, epochs = 1000):
+def SGDSearch_Ridge(tts, theta, learnSced=False, gamma = 0, epochs = 1000, scale = False):
+    if scale: #scala data
+        tts[0] =tts[0][:,1:]
+        tts[1] =tts[1][:,1:]
+        theta = np.random.randn(len(tts[0][0])) #first guess of beta
+        scaler = StandardScaler(with_std=False)
+        scaler.fit(tts[0])
+        tts[0] = scaler.transform(tts[0])
+        tts[1] = scaler.transform(tts[1])
+        scaler2 = StandardScaler(with_std=False)
+        scaler2.fit(tts[2].reshape(-1,1))
+        tts[2] = scaler2.transform(tts[2].reshape(-1,1))
+        tts[3] = scaler2.transform(tts[3].reshape(-1,1))
+        tts[2] =tts[2].flatten()
+        tts[3] =tts[3].flatten()
+
     nbatches = [1, 5, 20, 50, 100, 250]
     eta_ = 0.1
     etaLRid = np.logspace(-3,-0.8,4)
@@ -124,7 +138,7 @@ def SGDSearch_Ridge(learnSced=False, gamma = 0, epochs = 1000):
     optimal_lmb_test = lambdaL[minMSE_Ridge_test_index[0]]
     optimal_batch_train = nbatches[minMSE_Ridge_train_index[1]]
     optimal_batch_test = nbatches[minMSE_Ridge_test_index[1]]
-    make_heatmap(MSE_test_Ridge, nbatches, lambdaL, fn = f"ex1_hm_R_{epochs}", xlabel = "Number of mini batches", ylabel = "$\lambda$")
+    make_heatmap(MSE_test_Ridge, nbatches, lambdaL, fn = f"ex1_hm_R_{epochs}_sc{1 if scale else 0}.pdf", xlabel = "Number of mini batches", ylabel = "$\lambda$")
     print("Results for Ridge")
     print(f"Optimal lambda train {optimal_lmb_train}")
     print(f"Optimal lambda test {optimal_lmb_test}")
@@ -148,7 +162,21 @@ def SGDSearch_Ridge(learnSced=False, gamma = 0, epochs = 1000):
     print(f"MSE test Sklearn : {mse(tts[3],y_predictSKRid)}, eta={eta_}, lmb={optimal_lmb_test}")
     print(f"MSE test Regular Ridge: {mse(tts[3],y_predictRidge2)}")
 
-def SGDSearch_Ridge2(learnSced=False, gamma = 0, epochs = 1000):
+def SGDSearch_Ridge2(tts, theta, learnSced=False, gamma = 0, epochs = 1000, scale = False):
+    if scale: #scala data
+        tts[0] =tts[0][:,1:]
+        tts[1] =tts[1][:,1:]
+        theta = np.random.randn(len(tts[0][0])) #first guess of beta
+        scaler = StandardScaler(with_std=False)
+        scaler.fit(tts[0])
+        tts[0] = scaler.transform(tts[0])
+        tts[1] = scaler.transform(tts[1])
+        scaler2 = StandardScaler(with_std=False)
+        scaler2.fit(tts[2].reshape(-1,1))
+        tts[2] = scaler2.transform(tts[2].reshape(-1,1))
+        tts[3] = scaler2.transform(tts[3].reshape(-1,1))
+        tts[2] =tts[2].flatten()
+        tts[3] =tts[3].flatten()
     nbatches = [1, 5, 20, 50, 100, 250]
     eta_ = 0.1
     etaLRid = np.logspace(-4,-1,4)
@@ -178,18 +206,28 @@ def SGDSearch_Ridge2(learnSced=False, gamma = 0, epochs = 1000):
     optimal_lmb_test = lambdaL[minMSE_Ridge_test_index[0]]
     optimal_eta_train = etaLRid[minMSE_Ridge_train_index[1]]
     optimal_eta_test = etaLRid[minMSE_Ridge_test_index[1]]
-    make_heatmap(MSE_test_Ridge, etaLRid, lambdaL, title = "MSE as a funciton of different hyperparameters",fn = f"ex1_hm_R_{epochs}.pdf", xlabel = "$\eta$", ylabel = "$\lambda$")
+    make_heatmap(MSE_test_Ridge, etaLRid, lambdaL, title = "MSE as a funciton of different hyperparameters",fn = f"ex1_hm_R2_{epochs}_sc{1 if scale else 0}.pdf", xlabel = "$\eta$", ylabel = "$\lambda$")
     print("Results for Ridge")
     print(f"Optimal lambda train {optimal_lmb_train}")
     print(f"Optimal lambda test {optimal_lmb_test}")
     print(f"Optimal eta train {optimal_eta_train}")
     print(f"Optimal eta test {optimal_eta_test}")
 
-SGDSearch_OLS(learnSced=False, gamma = 0., epochs = 1000)
-#SGDSearch_OLS(learnSced=True)
-SGDSearch_Ridge2(learnSced=False, gamma = 0., epochs = 1000)
-#SGDSearch_Ridge(learnSced=True)
+#SGDSearch_OLS(tts, theta, learnSced=False, gamma = 0., epochs = 5000)
+#SGDSearch_OLS(tts, theta, learnSced=False, gamma = 0., epochs = 5000, scale = True)
+#SGDSearch_OLS(tts, learnSced=True)
+#SGDSearch_Ridge(tts, theta, learnSced=False, gamma = 0., epochs = 5000)
+#SGDSearch_Ridge(tts, theta, learnSced=False, gamma = 0., epochs = 5000, scale = True)
+#SGDSearch_Ridge2(tts, theta, learnSced=False, gamma = 0., epochs = 5000)
+SGDSearch_Ridge2(tts, theta, learnSced=False, gamma = 0., epochs = 5000, scale = True)
 #SklearnSGD følsom bedre når eta = 0.1
+
+
+
+
+
+
+
 
 def momentum(gamma=0,epoch=1000, eta = 0.0001, LS = False):
     beta, betaL = SGD(tts[0], tts[2], M=5, epochs = epoch, beta = theta, gradCostFunc = gradCostRidge,
@@ -225,8 +263,13 @@ def plot_momLS():
     plt.title("Rate of convergence")
     #plt.ylim(0,0.1)
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    plt.savefig(f"convergenceLS_e{epochs}_eta1emin4.pdf", bbox_inches='tight')
+    plt.savefig(f"convergenceLS_e{epochs}_eta1emin4.p1", bbox_inches='tight')
     plt.show()
+
+
+
+
+
 
 """
 Gamma 0 epochs 100
