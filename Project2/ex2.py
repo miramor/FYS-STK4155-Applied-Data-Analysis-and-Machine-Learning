@@ -35,6 +35,9 @@ n_neurons = np.array([1,5,7,10,12,15,20,25])
 lmb = 0.001
 mse_train = np.zeros((len(eta), len(n_neurons)))
 mse_test = np.zeros((len(eta), len(n_neurons)))
+r2_train = np.zeros((len(eta), len(n_neurons)))
+r2_test = np.zeros((len(eta), len(n_neurons)))
+
 
 actfunc = {
     "sigmoid": sigmoid,
@@ -43,7 +46,7 @@ actfunc = {
     "leaky_relu": leaky_relu
 }
 af = "sigmoid"
-"""
+
 for i,eta_ in enumerate(eta):
     for j,n_  in enumerate(n_neurons):
         NN = NeuralNetwork(X_train, y_train, epochs = 3000, batch_size = 50,
@@ -54,24 +57,39 @@ for i,eta_ in enumerate(eta):
 
         mse_train_ = mse(y_train.reshape(y_tilde.shape), y_tilde)
         mse_test_ = mse(y_test.reshape(y_predict.shape), y_predict)
+        r2_train_ = r2(y_train.reshape(y_tilde.shape), y_tilde)
+        r2_test_ = r2(y_test.reshape(y_predict.shape), y_predict)
+
 
         mse_train[i,j] = mse_train_
         mse_test[i,j] = mse_test_
+        r2_train[i,j] = r2_train_
+        r2_test[i,j] = r2_test_
 
         print(f"Eta: {eta_} | # of neurons: {n_}")
         print(f"Training MSE: {mse_train_}")
         print(f"Test MSE: {mse_test_}")
+        print(f"Training R2: {r2_train_}")
+        print(f"Test R2: {r2_test_}")
         print("------------------------")
-make_heatmap(mse_train, n_neurons, eta, fn = f"train_{af}_neur_eta.pdf",
+make_heatmap(mse_train, n_neurons, eta, fn = f"mse_train_{af}_neur_eta.pdf",
             xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "MSE training set")
-make_heatmap(mse_test, n_neurons, eta, fn = f"test_{af}_neur_eta.pdf",
+make_heatmap(mse_test, n_neurons, eta, fn = f"mse_test_{af}_neur_eta.pdf",
             xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "MSE test set")
+make_heatmap(r2_train, n_neurons, eta, fn = f"r2_train_{af}_neur_eta.pdf",
+            xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "R2 training set")
+make_heatmap(r2_test, n_neurons, eta, fn = f"r2_test_{af}_neur_eta.pdf",
+            xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "R2 test set")
+
 
 
 
 lambdas = np.logspace(-4,-1,4)
 mse_train = np.zeros((len(eta), len(lambdas)))
 mse_test = np.zeros((len(eta), len(lambdas)))
+r2_train = np.zeros((len(eta), len(lambdas)))
+r2_test = np.zeros((len(eta), len(lambdas)))
+
 for i,eta_ in enumerate(eta):
     for j,lmb_  in enumerate(lambdas):
         NN = NeuralNetwork(X_train, y_train, epochs = 3000, batch_size = 50,
@@ -82,26 +100,36 @@ for i,eta_ in enumerate(eta):
 
         mse_train_ = mse(y_train.reshape(y_tilde.shape), y_tilde)
         mse_test_ = mse(y_test.reshape(y_predict.shape), y_predict)
+        r2_train_ = r2(y_train.reshape(y_tilde.shape), y_tilde)
+        r2_test_ = r2(y_test.reshape(y_predict.shape), y_predict)
 
         mse_train[i,j] = mse_train_
         mse_test[i,j] = mse_test_
+        r2_train[i,j] = r2_train_
+        r2_test[i,j] = r2_test_
 
         print(f"Eta: {eta_} | lambda: {lmb_}")
         print(f"Training MSE: {mse_train_}")
         print(f"Test MSE: {mse_test_}")
+        print(f"Training R2: {r2_train_}")
+        print(f"Test R2: {r2_test_}")
         print("------------------------")
 
-make_heatmap(mse_train, lambdas, eta, fn = f"train_{af}_lambda_eta.pdf",
+make_heatmap(mse_train, lambdas, eta, fn = f"mse_train_{af}_lambda_eta.pdf",
             xlabel = "Regularization parameter $\lambda$", ylabel = "Learning rate $\eta$", title = "MSE training set")
-make_heatmap(mse_test, lambdas, eta, fn = f"test_{af}_lambda_eta.pdf",
+make_heatmap(mse_test, lambdas, eta, fn = f"mse_test_{af}_lambda_eta.pdf",
             xlabel = "Regularization parameter $\lambda$", ylabel = "Learning rate $\eta$", title = "MSE test set")
+make_heatmap(r2_train, lambdas, eta, fn = f"r2_train_{af}_lambda_eta.pdf",
+            xlabel = "Regularization parameter $\lambda$", ylabel = "Learning rate $\eta$", title = "R2 training set")
+make_heatmap(r2_test, lambdas, eta, fn = f"r2_test_{af}_lambda_eta.pdf",
+            xlabel = "Regularization parameter $\lambda$", ylabel = "Learning rate $\eta$", title = "R2 test set")
 
 
-
-"""
 
 print(f"MSE Train OLS: {mse(y_train, y_tildeOLS)}")
 print(f"MSE Test OLS: {mse(y_test, y_predictOLS)}")
+print(f"R2 Train OLS: {r2(y_train, y_tildeOLS)}")
+print(f"R2 Test OLS: {r2(y_test, y_predictOLS)}")
 
 print(kfold_nn_reg(X, y_noisy, 5, 0.01, 0.001, actfunc[af]))
 

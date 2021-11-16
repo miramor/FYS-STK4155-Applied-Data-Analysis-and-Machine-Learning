@@ -28,12 +28,12 @@ X=np.hstack((X,temp))
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2) #Split the data into training and test sets
 y_trainhot = to_categorical_numpy(y_train)
 
-eta = np.logspace(-4,-2,3)
+eta = np.logspace(-6,-4,3)
 n_neurons = np.logspace(0,2,3)
-n_neurons = np.array([10,25,50,75,100,125])
-lmb = 0
+n_neurons = np.array([50,100,150,200,250,300])
+lmb = 0.05
 print(f"Lambda = {lmb}")
-n_hl = 3
+n_hl = 2
 actfunc = {
 "sigmoid": sigmoid,
 "softmax": softmax,
@@ -42,11 +42,12 @@ actfunc = {
 }
 af = "sigmoid"
 
+
 train_accuracy = np.zeros((len(eta),len(n_neurons)))
 test_accuracy = np.zeros_like(train_accuracy)
 for i,eta_ in enumerate(eta):
     for j,n_  in enumerate(n_neurons):
-        NN = NeuralNetwork(X_train, y_trainhot, epochs = 2000, batch_size = 25,
+        NN = NeuralNetwork(X_train, y_trainhot, epochs = 5000, batch_size = 25,
             n_categories = 2, eta = eta_, lmbd = lmb, n_hidden_neurons = [n_]*n_hl, activation_function = actfunc[af])
         NN.train()
         y_tilde = NN.predict(X_train)
@@ -54,6 +55,7 @@ for i,eta_ in enumerate(eta):
 
         train_score = accuracy_score_numpy(y_tilde, y_train)
         test_score = accuracy_score_numpy(y_predict, y_test)
+        print(y_predict)
         train_accuracy[i,j] = train_score
         test_accuracy[i,j] = test_score
 
@@ -68,15 +70,35 @@ make_heatmap(train_accuracy, n_neurons, eta, fn = f"train_{af}_{n_hl}c.pdf",
             xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "Accuracy score training set")
 make_heatmap(test_accuracy, n_neurons, eta, fn = f"test_{af}_{n_hl}c.pdf",
             xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "Accuracy score test set")
+"""
+avg_acc1 = []
+avg_acc2 = []
+for i in range(10):
+    NN = NeuralNetwork(X_train, y_trainhot, epochs = 500, batch_size = 25,
+                n_categories = 2, eta = 1e-5, lmbd = lmb, n_hidden_neurons = [200]*n_hl, activation_function = actfunc[af])
+    NN.train()
+    NN.plot_accuracy()
+    y_tilde = NN.predict(X_train)
+    y_predict = NN.predict(X_test)
+    train_score = accuracy_score_numpy(y_tilde, y_train)
+    test_score = accuracy_score_numpy(y_predict, y_test)
+    
+    avg_acc1.append(train_score)
+    avg_acc2.append(test_score)
+    #print(f"Eta: {} | # of neurons: {}")
+    print(f"Training accuracy: {train_score}")
+    print(f"Test accuracy: {test_score}")
+    print("------------------------")
 
+print(f"Average train score: {np.mean(avg_acc1)}")
+print(f"Average test score: {np.mean(avg_acc2)}")
 
-
-
+"""
 #Sklearn implementation
 
 eta_vals = np.logspace(-5, 1, 7)
 lmbd_vals = np.logspace(-5, 1, 7)
-
+"""
 epochs = 1000
 
 n_hidden_neurons = 50
@@ -113,3 +135,5 @@ for i in range(len(eta_vals)):
 
 make_heatmap(test_accuracy_sklearn, lmbd_vals, eta_vals, fn = f"sklearn_class.pdf",
             xlabel = "lambda values", ylabel = "$\eta$ values", title = "Accuracy score sklearn")
+
+"""

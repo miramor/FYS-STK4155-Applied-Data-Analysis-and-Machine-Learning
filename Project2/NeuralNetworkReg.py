@@ -16,7 +16,7 @@ class NeuralNetwork:
             eta=0.01,
             lmbd=0,
             activation_function = sigmoid,
-            gradCostFunc = gradcostMSE):
+            output_activation = linear):
 
         self.X_data_full = X_data
         self.Y_data_full = Y_data
@@ -39,8 +39,8 @@ class NeuralNetwork:
         self.create_biases_and_weights()
 
         self.act_func = activation_function
-        self.gradCostFunc = gradCostFunc
-
+        self.output_activation = output_activation
+        self.performance = []
 
     def create_biases_and_weights(self):
         self.hidden_weights = []
@@ -66,7 +66,7 @@ class NeuralNetwork:
             self.a_h[i] = self.act_func(self.z_h[i])
 
         self.z_o = np.matmul(self.a_h[-1], self.output_weights) + self.output_bias
-
+        self.z_o = self.output_activation(self.z_o)
         #exp_term = np.exp(self.z_o)
         #self.probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
 
@@ -81,10 +81,7 @@ class NeuralNetwork:
 
         z_o = np.matmul(a_h_out, self.output_weights) + self.output_bias
 
-
-        #exp_term = np.exp(z_o)
-        #probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
-        return z_o #probabilities
+        return self.output_activation(z_o)
 
     def backpropagation(self):
         error_output = (self.z_o - self.Y_data.reshape(self.z_o.shape))# * self.act_func(self.z_o, derivative = True)
@@ -146,3 +143,5 @@ class NeuralNetwork:
 
                 self.feed_forward()
                 self.backpropagation()
+            y_tilde = self.predict_reg(self.X_data_full)
+            self.performance.append(mse(y_tilde, self.Y_data_full))

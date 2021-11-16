@@ -155,7 +155,10 @@ def softmax(x, derivative = False):
     if derivative:
         return softmax(x) * (1 - softmax(x))
     else:
-        return np.exp(x) / np.sum(np.exp(x), keepdims=True)
+        return np.exp(x) / np.sum(np.exp(x), axis = 1, keepdims=True)
+
+def linear(x):
+    return x
 
 def accuracy_score_numpy(Y_test, Y_pred):
     return np.sum(Y_test == Y_pred) / len(Y_test)

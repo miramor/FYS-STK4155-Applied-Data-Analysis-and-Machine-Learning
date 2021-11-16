@@ -15,8 +15,8 @@ class NeuralNetwork:
             batch_size=100,
             eta=0.01,
             lmbd=0.01,
-            activation_function = sigmoid):
-
+            activation_function = sigmoid,
+            output_activation = softmax):
         self.X_data_full = X_data
         self.Y_data_full = Y_data
 
@@ -38,8 +38,8 @@ class NeuralNetwork:
         self.create_biases_and_weights()
 
         self.act_func = activation_function
-
-
+        self.output_activation = output_activation
+        self.accuracy = [] #Storing accuracy after each epoch
 
     def create_biases_and_weights(self):
         self.hidden_weights = []
@@ -64,8 +64,9 @@ class NeuralNetwork:
             self.a_h[i] = self.act_func(self.z_h[i])
 
         self.z_o = np.matmul(self.a_h[-1], self.output_weights) + self.output_bias
-        exp_term = np.exp(self.z_o)
-        self.probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
+        #exp_term = np.exp(self.z_o)
+        #self.probabilities = exp_term / np.sum(exp_term, axis=0, keepdims=True)
+        self.probabilities = self.output_activation(self.z_o)
 
     def feed_forward_out(self, X):
         # feed-forward for output
@@ -78,10 +79,8 @@ class NeuralNetwork:
 
         z_o = np.matmul(a_h_out, self.output_weights) + self.output_bias
 
-
-        exp_term = np.exp(z_o)
-        probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
-        return probabilities
+        output = self.output_activation(z_o)
+        return output
 
     def backpropagation(self):
         error_output = (self.probabilities - self.Y_data) #* self.act_func(self.z_o, derivative = True) #
@@ -120,6 +119,10 @@ class NeuralNetwork:
         probabilities = self.feed_forward_out(X)
         return probabilities
 
+    def plot_accuracy(self):
+        epochs = [i for i in range(len(self.accuracy))]
+        plt.plot(epochs, self.accuracy)
+        plt.show()
 
     def train(self):
         data_indices = np.arange(self.n_inputs)
@@ -137,3 +140,8 @@ class NeuralNetwork:
 
                 self.feed_forward()
                 self.backpropagation()
+
+            y_tilde = self.predict(self.X_data_full)
+            train_score = accuracy_score_numpy(y_tilde, self.Y_data_full[:,1])
+            self.accuracy.append(train_score)
+
