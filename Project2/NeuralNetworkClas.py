@@ -119,14 +119,14 @@ class NeuralNetwork:
         probabilities = self.feed_forward_out(X)
         return probabilities
 
-    def plot_accuracy(self, save = False):
+    def plot_accuracy(self, save = False, fn = "pred_acc.pdf"):
         epochs = [i for i in range(len(self.accuracy))]
         plt.plot(epochs, self.accuracy)
         plt.xlabel("Epochs")
         plt.ylabel("Accuracy")
         plt.title("Prediction accuracy as function of epoch")
         if save:
-            plt.savefig("pred_acc.pdf", dpi = 400, bbox_inches='tight')
+            plt.savefig(fn, dpi = 400, bbox_inches='tight')
         plt.show()
 
 
@@ -150,4 +150,3 @@ class NeuralNetwork:
             y_tilde = self.predict(self.X_data_full)
             train_score = accuracy_score_numpy(y_tilde, self.Y_data_full[:,1])
             self.accuracy.append(train_score)
-

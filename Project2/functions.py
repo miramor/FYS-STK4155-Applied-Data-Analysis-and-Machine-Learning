@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import SGDRegressor
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from mpl_toolkits.mplot3d import Axes3D
+from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib
 from NeuralNetworkReg import NeuralNetwork
@@ -132,6 +133,20 @@ def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylab
     plt.savefig(fn, bbox_inches='tight')
     plt.show()
 
+def make_confusion_matrix(y_true,y_predict, fn = "defaultcm.pdf", title = "", xlabel = "", ylabel = "" ):
+    plt.clf()
+    cm = confusion_matrix(y_true,y_predict)
+    ax= plt.subplot()
+    sns.heatmap(cm, annot=True, fmt='g', ax=ax, cmap = "Blues");  #annot=True to annotate cells, ftm='g' to disable scientific notation
+
+    # labels, title and ticks
+    ax.set_xlabel('Predicted labels');ax.set_ylabel('True labels');
+    ax.set_title(f'Confusion Matrix {title}');
+    ax.xaxis.set_ticklabels(["0","1"]); ax.yaxis.set_ticklabels(["0","1"]);
+    plt.savefig(fn, dpi=400)
+    plt.show()
+
+
 def sigmoid(x, derivative = False): #sigmoid as activation Function
     if derivative:
         return sigmoid(x)*(1-sigmoid(x))
@@ -155,6 +170,8 @@ def softmax(x, derivative = False):
     if derivative:
         return softmax(x) * (1 - softmax(x))
     else:
+        x = np.where(x>500,500, x)
+        x = np.where(x<-500,-500, x)
         return np.exp(x) / np.sum(np.exp(x), axis = 1, keepdims=True)
 
 def linear(x):
@@ -221,7 +238,7 @@ def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in
     n = len(X)
     split = int(n/k) #Size of the folds
     mse2 = 0
-    
+
     for j in range(k): #Splits into training and test set
         if j == k-1:
             X_train = X[:j*split]
@@ -245,7 +262,7 @@ def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in
 
     return mse2/k
 
-def scale_data(X1,X2, with_std=False):
+def scale_data(X1,X2, scale_type = StandardScaler, with_std=False):
     try:
         X1 =X1[:,1:]
         X2 =X2[:,1:]
@@ -262,5 +279,3 @@ def scale_data(X1,X2, with_std=False):
         X2 =X2.flatten()
 
     return X1, X2
-
-

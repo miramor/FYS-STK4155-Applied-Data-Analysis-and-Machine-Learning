@@ -9,7 +9,7 @@ importlib.reload(functions); importlib.reload(NeuralNetworkClas)
 from functions import *
 from NeuralNetworkClas import *
 
-
+np.random.seed(2405)
 data = load_breast_cancer()
 x = data['data']
 y = data['target']
@@ -25,16 +25,19 @@ X=np.hstack((X,temp))
 temp=np.reshape(x[:,8],(len(x[:,8]),1))
 X=np.hstack((X,temp))
 
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2) #Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(x,y,test_size=0.2) #Split the data into training and test sets
 y_trainhot = to_categorical_numpy(y_train)
 scale = True
 if scale:
-    X_train, X_test = scale_data(X_train, X_test, with_std=True)
+    X_train, X_test = scale_data(X_train, X_test, scale_type = StandardScaler, with_std=True)
 
-eta = np.logspace(-6,-4,3)
+
+eta = np.logspace(-4,-2,3)
+lambdas = np.logspace(-4,-2,3)
 n_neurons = np.logspace(0,2,3)
-n_neurons = np.array([50,100,150,200,250,300])
-lmb = 0
+n_neurons = np.array([50,100,150,200,250])
+n_neurons2= np.array([20,50,70,120,150])
+lmb = 0.0001
 print(f"Lambda = {lmb}")
 n_hl = 3
 actfunc = {
@@ -45,26 +48,62 @@ actfunc = {
 }
 af = "sigmoid"
 
-
-NN = NeuralNetwork(X_train, y_trainhot, epochs = 1000, batch_size = 25,
-    n_categories = 2, eta = 1e-6, lmbd = lmb, n_hidden_neurons = [300]*n_hl, activation_function = actfunc[af])
+NN = NeuralNetwork(X_train, y_trainhot, epochs = 50, batch_size = 10,
+    n_categories = 2, eta = 0.01, lmbd = 0.001, n_hidden_neurons = [50,20,50], activation_function = actfunc[af])
 NN.train()
-NN.plot_accuracy(save=True)
+NN.plot_accuracy(save=False, fn="pred_acc_eta1emin4")
 y_tilde = NN.predict(X_train)
 y_predict = NN.predict(X_test)
 train_score = accuracy_score_numpy(y_tilde, y_train)
 test_score = accuracy_score_numpy(y_predict, y_test)
-
 print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
 print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
+make_confusion_matrix(y_test, y_predict, fn="cm_heatmap.pdf", title = "Own Neural Network")
+
 
 """
+train_accuracy = np.zeros((len(lambdas),len(n_neurons)))
+test_accuracy = np.zeros_like(train_accuracy)
+for i,lmb_ in enumerate(lambdas):
+    for j,n_  in enumerate(n_neurons):
+        NN = NeuralNetwork(X_train, y_trainhot, epochs = 50, batch_size = 10,
+            n_categories = 2, eta = 0.01, lmbd = lmb_, n_hidden_neurons = [n_,n_, n_], activation_function = actfunc[af])
+        NN.train()
+        NN.plot_accuracy()
+        y_tilde = NN.predict(X_train)
+        y_predict = NN.predict(X_test)
+
+        train_score = accuracy_score_numpy(y_tilde, y_train)
+        test_score = accuracy_score_numpy(y_predict, y_test)
+        train_accuracy[i,j] = train_score
+        test_accuracy[i,j] = test_score
+
+        print(f"Lambda: {lmb_} | # of neurons: {n_}")
+        print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
+        print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
+        print("------------------------")
+
+
+make_confusion_matrix(y_test, y_predict)
+
+make_heatmap(train_accuracy, n_neurons, lambdas, fn = f"train_{af}_sc{1 if scale else 0}_L{n_hl}_eta001c.pdf",
+            xlabel = "Number of neurons per layer", ylabel = "Regularization parameter $\lambda$", title = "Accuracy score training set")
+make_heatmap(test_accuracy, n_neurons, lambdas, fn = f"test_{af}_sc{1 if scale else 0}_L{n_hl}_eta001c.pdf",
+            xlabel = "Number of neurons per layer", ylabel = "Regularization parameter $\lambda$", title = "Accuracy score test set")
+"""
+
+
+"""
+
+
+
+
 train_accuracy = np.zeros((len(eta),len(n_neurons)))
 test_accuracy = np.zeros_like(train_accuracy)
 for i,eta_ in enumerate(eta):
     for j,n_  in enumerate(n_neurons):
-        NN = NeuralNetwork(X_train, y_trainhot, epochs = 5000, batch_size = 25,
-            n_categories = 2, eta = eta_, lmbd = lmb, n_hidden_neurons = [n_]*n_hl, activation_function = actfunc[af])
+        NN = NeuralNetwork(X_train, y_trainhot, epochs = 500, batch_size = 10,
+            n_categories = 2, eta = eta_, lmbd = lmb, n_hidden_neurons = [n_,n_, n_], activation_function = actfunc[af])
         NN.train()
         NN.plot_accuracy()
         y_tilde = NN.predict(X_train)
@@ -81,12 +120,17 @@ for i,eta_ in enumerate(eta):
         print("------------------------")
 
 
-
+make_confusion_matrix(y_test, y_predict)
 
 make_heatmap(train_accuracy, n_neurons, eta, fn = f"train_{af}_sc{1 if scale else 0}_L{n_hl}_c.pdf",
             xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "Accuracy score training set")
 make_heatmap(test_accuracy, n_neurons, eta, fn = f"test_{af}_sc{1 if scale else 0}_L{n_hl}_c.pdf",
             xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "Accuracy score test set")
+
+
+
+
+
 avg_acc1 = []
 avg_acc2 = []
 for i in range(10):
@@ -98,7 +142,7 @@ for i in range(10):
     y_predict = NN.predict(X_test)
     train_score = accuracy_score_numpy(y_tilde, y_train)
     test_score = accuracy_score_numpy(y_predict, y_test)
-    
+
     avg_acc1.append(train_score)
     avg_acc2.append(test_score)
     #print(f"Eta: {} | # of neurons: {}")
@@ -109,11 +153,12 @@ for i in range(10):
 print(f"Average train score: {np.mean(avg_acc1)}")
 print(f"Average test score: {np.mean(avg_acc2)}")
 
-"""
+
 #Sklearn implementation
 
 eta_vals = np.logspace(-5, 1, 7)
 lmbd_vals = np.logspace(-5, 1, 7)
+"""
 """
 epochs = 1000
 
@@ -153,3 +198,21 @@ make_heatmap(test_accuracy_sklearn, lmbd_vals, eta_vals, fn = f"sklearn_class.pd
             xlabel = "lambda values", ylabel = "$\eta$ values", title = "Accuracy score sklearn")
 
 """
+
+
+
+from sklearn.neural_network import MLPClassifier
+plt.clf()
+clf = MLPClassifier(random_state=1, hidden_layer_sizes = (50,20,50), solver = "sgd", batch_size = 10, max_iter=150, learning_rate_init = 0.01, alpha = 0.01).fit(X_train, y_train)
+pred_nn = clf.predict(X_test)
+print(accuracy_score_numpy(pred_nn, y_test))
+make_confusion_matrix(y_test, pred_nn, fn="cm_heatmapsklearn.pdf", title = "SKlearn Neural Network")
+"""cm_nn = confusion_matrix(y_test, pred_nn)
+
+
+sns.heatmap(cm_nn, annot=True, cmap='Blues')
+plt.title("SKlearn Neural Network")
+plt.xlabel("Predicted values")
+plt.ylabel("True Values")
+plt.savefig("Confusion_matrix_nn_sklearn.pdf", bbox_inches='tight')
+plt.show()"""
