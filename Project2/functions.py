@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import SGDRegressor
+from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.metrics import confusion_matrix
@@ -117,8 +118,8 @@ def plotmseREL(MSE,LR,lmb):
     plt.savefig("HeatMapMSE_REL.pdf", bbox_inches='tight')
     plt.show()
 
-def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "" ):
-    plt.clf()
+
+def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "", with_precision = False):
     fig, ax = plt.subplots()
     x_vals = []
     y_vals = []
@@ -126,7 +127,10 @@ def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylab
         x_vals.append(np.format_float_scientific(x[i], precision=1))
     for i in range(len(y)):
         y_vals.append(np.format_float_scientific(y[i], precision=1))
-    sns.heatmap(z, annot=True, ax=ax, xticklabels=x, yticklabels=y, cmap="viridis")
+    if with_precision:
+        sns.heatmap(z, annot=True, ax=ax, xticklabels=x_vals, yticklabels=y_vals, cmap="viridis")
+    else:
+        sns.heatmap(z, annot=True, ax=ax, xticklabels=x, yticklabels=y, cmap="viridis")
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
@@ -178,6 +182,8 @@ def linear(x):
     return x
 
 def accuracy_score_numpy(Y_test, Y_pred):
+    #print(f"This is Y_test: {Y_test}")
+    #print(f"This is Y_pred: {Y_pred}")
     return np.sum(Y_test == Y_pred) / len(Y_test)
 
 
@@ -191,54 +197,51 @@ def to_categorical_numpy(integer_vector):
     return onehot_vector
 
 
-def predict_logistic(x, coef):
-    if len(x) == 1:
-        y_pred = coef[0]
-        for j in range(len(x[0])-1):
-            y_pred += coef[j+1]*x[0][j]
-        if y_pred < -500:
-            return 0
-        elif y_pred > 500:
-            return 1
-        else:
-            return 1/(1+np.exp(-y_pred))
+def predict_logistic(X, coef):
+    y_pred = X @ coef
+    if max(abs(y_pred)) < 500:
+        return np.around(1/(1+np.exp(-y_pred)))
     else:
-        pred = []
-        for i in range(len(x)):
-            print(x[i])
-            pred.append(round(predict_logistic([x[i]], coef)))
-        return pred
+        if type(y_pred) == type(1.5):
+            if y_pred > 500:
+                return 1
+            else:
+                return 0
+        else:
+            for i in range(len(y_pred)):
+                if y_pred[i] > 500:
+                    y_pred[i] = 1
+                elif y_pred[i] < -500:
+                    y_pred[i] = 0
+                else:
+                    y_pred[i] = np.around(1/(1+np.exp(-y_pred[i])))
+            return y_pred
+
+
+def gradLogistic(X, y, coef, lmbd):
+    m = len(y)
+    grad = (predict_logistic(X, coef) - y) @ X + lmbd * coef
+    grad = (1/m)*grad
+    return grad
+
 
 
 def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
     n = len(X_train) #number of datapoints
-    m = int(n/M) #number of mini-batch cycles (M: size of batch)
-    n_coef = len(X_train[0]) + 1
-    coef = [0]*n_coef
-    for e in range(n_epochs):
-        s_error = 0
-        for i in range(m):
-            random_index = np.random.randint(m)
-            xi = X_train[random_index:random_index+1][0]
-            yi = y_train[random_index:random_index+1][0]
-            y_pred = predict_logistic([xi], coef)
-            error = y_pred - yi
-            s_error += error**2
-            coef[0] = coef[0] - learn_rate*error
-            for j in range(1,n_coef):
-                coef[j] = coef[j] - learn_rate*(error*xi[j-1]+lmb*coef[j])
+    n_coef = len(X_train[0])
+    coef = np.zeros(n_coef)
+    coef = SGD(X_train, y_train, M, n_epochs, gradLogistic, coef, learn_rate, lmb)
+    #print(coef)
     return coef
 
-
-def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in logistic regression,  X = X_train, z = z_train
+def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-fold method for use in logistic regression,  X = X_train, z = z_train
     mse_test = np.zeros(k) #for storing kfold samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
     mse_train = np.zeros(k)
     r2_test = np.zeros(k)
     r2_train = np.zeros(k)
     n = len(X)
     split = int(n/k) #Size of the folds
-    mse2 = 0
-
+    accuracy = 0
     for j in range(k): #Splits into training and test set
         if j == k-1:
             X_train = X[:j*split]
@@ -250,6 +253,14 @@ def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in
             X_test = X[j*split:(j+1)*split]
             y_train = np.concatenate((y[:(j)*split], y[(j+1)*split:]))
             y_test = y[j*split:(j+1)*split]
+        if sklearn:
+            clf = SGDClassifier(loss="log", penalty="l2", learning_rate = "constant", eta0 = eta, alpha = lmbd, max_iter=n_epochs).fit(X_train, y_train)
+            pred_sklearn = clf.predict(X_test)
+            accuracy += accuracy_score_numpy(pred_sklearn, y_test)
+        else:
+            coef = logistic_reg(X_train, y_train, eta, lmbd, n_epochs, 10)
+            test_pred = predict_logistic(X_test, coef)
+            accuracy += accuracy_score_numpy(test_pred, y_test)
 
 
         NN = NeuralNetwork(X_train, y_train, epochs = 3000, batch_size = 50,
