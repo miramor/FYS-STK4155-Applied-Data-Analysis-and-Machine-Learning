@@ -25,6 +25,11 @@ X_ols  = createX(x1,x2,5)
 X_train, X_test, y_train, y_test = train_test_split(X,y_noisy,test_size=0.2) #Split the data into training and test sets
 X_train_ols, X_test_ols, y_train_ols, y_test_ols = train_test_split(X,y_noisy, test_size=0.2)
 
+
+scale = True
+if scale:
+    X_train, X_test = scale_data(X_train, X_test)
+
 betaOLS = ols(X_train_ols, y_train_ols)
 y_tildeOLS = predict(X_train, betaOLS)
 y_predictOLS = predict(X_test, betaOLS)

@@ -244,3 +244,13 @@ def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in
 
 
     return mse2/k
+
+def scale_data(X1,X2, with_std=False):
+    X1 =X1[:,1:]
+    X2 =X2[:,1:]
+    scaler = StandardScaler(with_std=with_std)
+    scaler.fit(X1)
+    X1 = scaler.transform(X1)
+    X2 = scaler.transform(X2)
+
+    return X1, X2

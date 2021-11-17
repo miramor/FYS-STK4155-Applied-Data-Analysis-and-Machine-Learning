@@ -119,10 +119,16 @@ class NeuralNetwork:
         probabilities = self.feed_forward_out(X)
         return probabilities
 
-    def plot_accuracy(self):
+    def plot_accuracy(self, save = False):
         epochs = [i for i in range(len(self.accuracy))]
         plt.plot(epochs, self.accuracy)
+        plt.xlabel("Epochs")
+        plt.ylabel("Accuracy")
+        plt.title("Prediction accuracy as function of epoch")
+        if save:
+            plt.savefig("pred_acc.pdf", dpi = 400, bbox_inches='tight')
         plt.show()
+
 
     def train(self):
         data_indices = np.arange(self.n_inputs)

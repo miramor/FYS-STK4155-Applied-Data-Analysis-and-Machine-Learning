@@ -27,13 +27,16 @@ X=np.hstack((X,temp))
 
 X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2) #Split the data into training and test sets
 y_trainhot = to_categorical_numpy(y_train)
+scale = True
+if scale:
+    X_train, X_test = scale_data(X_train, X_test, with_std=True)
 
 eta = np.logspace(-6,-4,3)
 n_neurons = np.logspace(0,2,3)
 n_neurons = np.array([50,100,150,200,250,300])
-lmb = 0.05
+lmb = 0
 print(f"Lambda = {lmb}")
-n_hl = 2
+n_hl = 3
 actfunc = {
 "sigmoid": sigmoid,
 "softmax": softmax,
@@ -43,6 +46,19 @@ actfunc = {
 af = "sigmoid"
 
 
+NN = NeuralNetwork(X_train, y_trainhot, epochs = 1000, batch_size = 25,
+    n_categories = 2, eta = 1e-6, lmbd = lmb, n_hidden_neurons = [300]*n_hl, activation_function = actfunc[af])
+NN.train()
+NN.plot_accuracy(save=True)
+y_tilde = NN.predict(X_train)
+y_predict = NN.predict(X_test)
+train_score = accuracy_score_numpy(y_tilde, y_train)
+test_score = accuracy_score_numpy(y_predict, y_test)
+
+print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
+print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
+
+"""
 train_accuracy = np.zeros((len(eta),len(n_neurons)))
 test_accuracy = np.zeros_like(train_accuracy)
 for i,eta_ in enumerate(eta):
@@ -50,12 +66,12 @@ for i,eta_ in enumerate(eta):
         NN = NeuralNetwork(X_train, y_trainhot, epochs = 5000, batch_size = 25,
             n_categories = 2, eta = eta_, lmbd = lmb, n_hidden_neurons = [n_]*n_hl, activation_function = actfunc[af])
         NN.train()
+        NN.plot_accuracy()
         y_tilde = NN.predict(X_train)
         y_predict = NN.predict(X_test)
 
         train_score = accuracy_score_numpy(y_tilde, y_train)
         test_score = accuracy_score_numpy(y_predict, y_test)
-        print(y_predict)
         train_accuracy[i,j] = train_score
         test_accuracy[i,j] = test_score
 
@@ -66,11 +82,11 @@ for i,eta_ in enumerate(eta):
 
 
 
-make_heatmap(train_accuracy, n_neurons, eta, fn = f"train_{af}_{n_hl}c.pdf",
+
+make_heatmap(train_accuracy, n_neurons, eta, fn = f"train_{af}_sc{1 if scale else 0}_L{n_hl}_c.pdf",
             xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "Accuracy score training set")
-make_heatmap(test_accuracy, n_neurons, eta, fn = f"test_{af}_{n_hl}c.pdf",
+make_heatmap(test_accuracy, n_neurons, eta, fn = f"test_{af}_sc{1 if scale else 0}_L{n_hl}_c.pdf",
             xlabel = "Number of neurons per layer", ylabel = "Learning rate $\eta$", title = "Accuracy score test set")
-"""
 avg_acc1 = []
 avg_acc2 = []
 for i in range(10):
