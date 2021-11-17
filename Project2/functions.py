@@ -50,7 +50,7 @@ def mse(y, y_model): #Calculates the MSE for a model
 
 def r2(y, y_model): #Calculates the R2 score for a model
     n = len(y)
-    return 1 - n*mse(y,y_model)/np.sum((y-np.mean(z))**2)
+    return 1 - n*mse(y,y_model)/np.sum((y-np.mean(y))**2)
 
 def createX(x, y, n): #Creates design matrix with data x,y and complexity n
     if len(x.shape) > 1:
@@ -246,11 +246,21 @@ def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in
     return mse2/k
 
 def scale_data(X1,X2, with_std=False):
-    X1 =X1[:,1:]
-    X2 =X2[:,1:]
-    scaler = StandardScaler(with_std=with_std)
-    scaler.fit(X1)
-    X1 = scaler.transform(X1)
-    X2 = scaler.transform(X2)
+    try:
+        X1 =X1[:,1:]
+        X2 =X2[:,1:]
+        scaler = StandardScaler(with_std=with_std)
+        scaler.fit(X1)
+        X1 = scaler.transform(X1)
+        X2 = scaler.transform(X2)
+    except:
+        scaler = StandardScaler(with_std=False)
+        scaler.fit(X1.reshape(-1,1))
+        X1 = scaler.transform(X1.reshape(-1,1))
+        X2 = scaler.transform(X2.reshape(-1,1))
+        X1 =X1.flatten()
+        X2 =X2.flatten()
 
     return X1, X2
+
+
