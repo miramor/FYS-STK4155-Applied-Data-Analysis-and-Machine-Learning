@@ -6,11 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import matplotlib
-<<<<<<< HEAD
-
-=======
 from NeuralNetworkReg import NeuralNetwork
->>>>>>> 5a789035a6a5c3cb05ad06652699da17a31241a0
 plt.style.use("seaborn")
 sns.set(font_scale=1.5)
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
@@ -121,12 +117,8 @@ def plotmseREL(MSE,LR,lmb):
     plt.savefig("HeatMapMSE_REL.pdf", bbox_inches='tight')
     plt.show()
 
-<<<<<<< HEAD
+
 def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "", with_precision = False):
-=======
-def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "" ):
-    plt.clf()
->>>>>>> 5a789035a6a5c3cb05ad06652699da17a31241a0
     fig, ax = plt.subplots()
     x_vals = []
     y_vals = []
@@ -193,7 +185,6 @@ def predict_logistic(X, coef):
     if max(abs(y_pred)) < 500:
         return np.around(1/(1+np.exp(-y_pred)))
     else:
-<<<<<<< HEAD
         if type(y_pred) == type(1.5):
             if y_pred > 500:
                 return 1
@@ -215,13 +206,7 @@ def gradLogistic(X, y, coef, lmbd):
     grad = (predict_logistic(X, coef) - y) @ X + lmbd * coef
     grad = (1/m)*grad
     return grad
-=======
-        pred = []
-        for i in range(len(x)):
-            print(x[i])
-            pred.append(round(predict_logistic([x[i]], coef)))
-        return pred
->>>>>>> 5a789035a6a5c3cb05ad06652699da17a31241a0
+
 
 
 def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
@@ -232,24 +217,14 @@ def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
     #print(coef)
     return coef
 
-<<<<<<< HEAD
 def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-fold method for use in logistic regression,  X = X_train, z = z_train
-=======
-
-def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in logistic regression,  X = X_train, z = z_train
->>>>>>> 5a789035a6a5c3cb05ad06652699da17a31241a0
     mse_test = np.zeros(k) #for storing kfold samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
     mse_train = np.zeros(k)
     r2_test = np.zeros(k)
     r2_train = np.zeros(k)
     n = len(X)
     split = int(n/k) #Size of the folds
-<<<<<<< HEAD
     accuracy = 0
-=======
-    mse2 = 0
-    
->>>>>>> 5a789035a6a5c3cb05ad06652699da17a31241a0
     for j in range(k): #Splits into training and test set
         if j == k-1:
             X_train = X[:j*split]
@@ -261,7 +236,6 @@ def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in
             X_test = X[j*split:(j+1)*split]
             y_train = np.concatenate((y[:(j)*split], y[(j+1)*split:]))
             y_test = y[j*split:(j+1)*split]
-<<<<<<< HEAD
         if sklearn:
             clf = SGDClassifier(loss="log", penalty="l2", learning_rate = "constant", eta0 = eta, alpha = lmbd, max_iter=n_epochs).fit(X_train, y_train)
             pred_sklearn = clf.predict(X_test)
@@ -273,36 +247,3 @@ def kfold_nn_reg(X,y,k, lmb, eta, actfunc): #Implements k-fold method for use in
 
 
     return accuracy/k
-=======
-
-
-        NN = NeuralNetwork(X_train, y_train, epochs = 3000, batch_size = 50,
-            n_categories = 1, eta = eta, lmbd = lmb, n_hidden_neurons = [10,10], activation_function = actfunc)
-        NN.train()
-        y_tilde = NN.predict_reg(X_train)
-        y_predict = NN.predict_reg(X_test)
-        mse2 += mse(y_test.reshape(y_predict.shape), y_predict)
-
-
-    return mse2/k
-
-def scale_data(X1,X2, with_std=False):
-    try:
-        X1 =X1[:,1:]
-        X2 =X2[:,1:]
-        scaler = StandardScaler(with_std=with_std)
-        scaler.fit(X1)
-        X1 = scaler.transform(X1)
-        X2 = scaler.transform(X2)
-    except:
-        scaler = StandardScaler(with_std=False)
-        scaler.fit(X1.reshape(-1,1))
-        X1 = scaler.transform(X1.reshape(-1,1))
-        X2 = scaler.transform(X2.reshape(-1,1))
-        X1 =X1.flatten()
-        X2 =X2.flatten()
-
-    return X1, X2
-
-
->>>>>>> 5a789035a6a5c3cb05ad06652699da17a31241a0
