@@ -27,6 +27,9 @@ betaOLS2 = ols(tts[0], tts[2]) #regular OLS regression
 y_tildeOLS2 = predict(tts[0],betaOLS2) #regular OLS regression
 y_predictOLS2 = predict(tts[1],betaOLS2)
 
+
+
+
 #OLS
 def SGDSearch_OLS(tts, theta, learnSced=False, gamma = 0, epochs = 1000, scale = False):
     if scale: #scala data
@@ -167,11 +170,11 @@ def SGDSearch_Ridge2(tts, theta, learnSced=False, gamma = 0, epochs = 1000, scal
         tts[0] =tts[0][:,1:]
         tts[1] =tts[1][:,1:]
         theta = np.random.randn(len(tts[0][0])) #first guess of beta
-        scaler = StandardScaler(with_std=False)
+        scaler = StandardScaler(with_std=True)
         scaler.fit(tts[0])
         tts[0] = scaler.transform(tts[0])
         tts[1] = scaler.transform(tts[1])
-        scaler2 = StandardScaler(with_std=False)
+        scaler2 = StandardScaler(with_std=True)
         scaler2.fit(tts[2].reshape(-1,1))
         tts[2] = scaler2.transform(tts[2].reshape(-1,1))
         tts[3] = scaler2.transform(tts[3].reshape(-1,1))
@@ -219,14 +222,26 @@ def SGDSearch_Ridge2(tts, theta, learnSced=False, gamma = 0, epochs = 1000, scal
 #SGDSearch_Ridge(tts, theta, learnSced=False, gamma = 0., epochs = 5000)
 #SGDSearch_Ridge(tts, theta, learnSced=False, gamma = 0., epochs = 5000, scale = True)
 #SGDSearch_Ridge2(tts, theta, learnSced=False, gamma = 0., epochs = 5000)
-SGDSearch_Ridge2(tts, theta, learnSced=False, gamma = 0., epochs = 5000, scale = True)
+#SGDSearch_Ridge2(tts, theta, learnSced=False, gamma = 0., epochs = 5000, scale = True)
 #SklearnSGD følsom bedre når eta = 0.1
 
 
 
+betaOLS, betaL = SGD(tts[0], tts[2], M=5, epochs = 500, beta = theta, gradCostFunc = gradCostOls, eta = 0.1)
+betaRidge, betaL = SGD(tts[0], tts[2], M=5, epochs = 500, beta = theta, gradCostFunc = gradCostRidge, eta = 0.1, lmb=0.001)
+betaSKOLS = SklearnSGD(tts[0], tts[2], penalty = None, eta = 0.01, epochs=500, alpha=0)
+betaSKRidge = SklearnSGD(tts[0], tts[2], penalty = "l2", eta = 0.01, epochs=500, alpha=0.001)
 
+y_predictOLS = predict(tts[1], betaOLS)
+y_predictRidge = predict(tts[1], betaRidge)
+y_predictSKOLS = predict(tts[1], betaSKOLS)
+y_predictSKRidge = predict(tts[1], betaSKRidge)
 
-
+mseOLS = mse(tts[3], y_predictOLS)
+mseRidge = mse(tts[3], y_predictRidge)
+mseSKOLS = mse(tts[3], y_predictSKOLS)
+mseSKRidge = mse(tts[3], y_predictSKRidge)
+print(mseOLS, mseRidge, mseSKOLS, mseSKRidge)
 
 
 def momentum(gamma=0,epoch=1000, eta = 0.0001, LS = False):
