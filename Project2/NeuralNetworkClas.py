@@ -123,7 +123,6 @@ class NeuralNetwork:
 
     def train(self):
         data_indices = np.arange(self.n_inputs)
-
         for i in range(self.epochs):
             for j in range(self.iterations):
                 #pick datapoints with replacement
@@ -137,3 +136,11 @@ class NeuralNetwork:
 
                 self.feed_forward()
                 self.backpropagation()
+<<<<<<< Updated upstream
+=======
+
+            y_tilde = self.predict(self.X_data_full)
+            train_score = accuracy_score_numpy(y_tilde, self.Y_data_full[:,1])
+            self.accuracy.append(train_score)
+        
+>>>>>>> Stashed changes

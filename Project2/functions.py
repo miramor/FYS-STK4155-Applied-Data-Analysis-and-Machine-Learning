@@ -183,3 +183,93 @@ def to_categorical_numpy(integer_vector):
     onehot_vector[range(n_inputs), integer_vector] = 1
 
     return onehot_vector
+
+
+def predict_logistic(X, coef):
+    y_pred = X @ coef
+    if max(abs(y_pred)) < 500:
+        return np.around(1/(1+np.exp(-y_pred)))
+    else:
+        if type(y_pred) == type(1.5):
+            if y_pred > 500:
+                return 1
+            else:
+                return 0
+        else:
+            for i in range(len(y_pred)):
+                if y_pred[i] > 500:
+                    y_pred[i] = 1
+                elif y_pred[i] < -500:
+                    y_pred[i] = 0
+                else:
+                    y_pred[i] = np.around(1/(1+np.exp(-y_pred[i])))
+            return y_pred
+
+
+def gradLogistic(X, y, coef, lmbd):
+    m = len(y)
+    grad = (predict_logistic(X, coef) - y) @ X + lmbd * coef
+    grad = (1/m)*grad
+    return grad
+
+
+
+def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
+    n = len(X_train) #number of datapoints
+    n_coef = len(X_train[0])
+    coef = np.zeros(n_coef)
+    coef = SGD(X_train, y_train, M, n_epochs, gradLogistic, coef, learn_rate, lmb)
+    #print(coef)
+    return coef
+
+def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-fold method for use in logistic regression,  X = X_train, z = z_train
+    mse_test = np.zeros(k) #for storing kfold samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
+    mse_train = np.zeros(k)
+    r2_test = np.zeros(k)
+    r2_train = np.zeros(k)
+    n = len(X)
+    split = int(n/k) #Size of the folds
+    accuracy = 0
+    for j in range(k): #Splits into training and test set
+        if j == k-1:
+            X_train = X[:j*split]
+            X_test = X[j*split:]
+            y_train = y[:j*split]
+            y_test = y[j*split:]
+        else:
+            X_train = np.concatenate((X[:(j)*split], X[(j+1)*split:]), axis = 0)
+            X_test = X[j*split:(j+1)*split]
+            y_train = np.concatenate((y[:(j)*split], y[(j+1)*split:]))
+            y_test = y[j*split:(j+1)*split]
+        if sklearn:
+            clf = SGDClassifier(loss="log", penalty="l2", learning_rate = "constant", eta0 = eta, alpha = lmbd, max_iter=n_epochs).fit(X_train, y_train)
+            pred_sklearn = clf.predict(X_test)
+            accuracy += accuracy_score_numpy(pred_sklearn, y_test)
+        else:
+            coef = logistic_reg(X_train, y_train, eta, lmbd, n_epochs, 10)
+            test_pred = predict_logistic(X_test, coef)
+            accuracy += accuracy_score_numpy(test_pred, y_test)
+
+
+    return accuracy
+
+
+    return mse2/k
+
+def scale_data(X1,X2, scale_type = StandardScaler, with_std=False):
+    try:
+        X1 =X1[:,1:]
+        X2 =X2[:,1:]
+        scaler = StandardScaler(with_std=with_std)
+        scaler.fit(X1)
+        X1 = scaler.transform(X1)
+        X2 = scaler.transform(X2)
+    except:
+        scaler = StandardScaler(with_std=False)
+        scaler.fit(X1.reshape(-1,1))
+        X1 = scaler.transform(X1.reshape(-1,1))
+        X2 = scaler.transform(X2.reshape(-1,1))
+        X1 =X1.flatten()
+        X2 =X2.flatten()
+
+    return X1, X2

@@ -136,4 +136,26 @@ for i in range(len(eta_vals)):
 make_heatmap(test_accuracy_sklearn, lmbd_vals, eta_vals, fn = f"sklearn_class.pdf",
             xlabel = "lambda values", ylabel = "$\eta$ values", title = "Accuracy score sklearn")
 
+<<<<<<< Updated upstream
 """
+=======
+"""
+
+
+
+from sklearn.neural_network import MLPClassifier
+plt.clf()
+clf = MLPClassifier(random_state=1, hidden_layer_sizes = (50,20,50), activation = "logistic", solver = "sgd", batch_size = 10, max_iter=150, learning_rate_init = 0.01, alpha = 0.01).fit(X_train, y_train)
+pred_nn = clf.predict(X_test)
+print(accuracy_score_numpy(pred_nn, y_test))
+make_confusion_matrix(y_test, pred_nn, fn="cm_heatmapsklearn.pdf", title = "SKlearn Neural Network")
+"""cm_nn = confusion_matrix(y_test, pred_nn)
+
+
+sns.heatmap(cm_nn, annot=True, cmap='Blues')
+plt.title("SKlearn Neural Network")
+plt.xlabel("Predicted values")
+plt.ylabel("True Values")
+plt.savefig("Confusion_matrix_nn_sklearn.pdf", bbox_inches='tight')
+plt.show()"""
+>>>>>>> Stashed changes
