@@ -12,7 +12,7 @@ sns.set(font_scale=1.5)
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
 
-def SGD(X, y, M, epochs, gradCostFunc, beta, eta, gamma = 0, lmb = None, LS=False): #Stochastic Gradient Descent
+def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None, gamma = 0, LS=False): #Stochastic Gradient Descent
     """
     Stochastic Gradient Descent.
     Takes in number of epochs, gradient cost fucntion, initial beta values,
@@ -255,6 +255,7 @@ def predict_logistic(X, coef):
     """
     Predicts class. Used for logistic regression
     """
+
     y_pred = X @ coef
     if max(abs(y_pred)) < 500:
         return np.around(1/(1+np.exp(-y_pred)))
@@ -293,18 +294,13 @@ def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
     n = len(X_train) #number of datapoints
     n_coef = len(X_train[0])
     coef = np.zeros(n_coef)
-    coef = SGD(X_train, y_train, M, n_epochs, gradLogistic, coef, learn_rate, lmb)
-    #print(coef)
+    coef,coefL = SGD(X_train, y_train, M, n_epochs, gradLogistic, coef, learn_rate, lmb)
     return coef
 
 def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-fold method for use in logistic regression,  X = X_train, z = z_train
     """
     K-fold for logistic regression
     """
-    mse_test = np.zeros(k) #for storing kfold samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
-    mse_train = np.zeros(k)
-    r2_test = np.zeros(k)
-    r2_train = np.zeros(k)
     n = len(X)
     split = int(n/k) #Size of the folds
     accuracy = 0
@@ -325,7 +321,8 @@ def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-f
             accuracy += accuracy_score_numpy(pred_sklearn, y_test)
         else:
             coef = logistic_reg(X_train, y_train, eta, lmbd, n_epochs, 10)
-            test_pred = predict_logistic(X_test, coef)
+            test_pred = predict_logistic(X_test, coef[1])
+
             accuracy += accuracy_score_numpy(test_pred, y_test)
     return accuracy/k
 
