@@ -261,32 +261,4 @@ def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-f
             coef = logistic_reg(X_train, y_train, eta, lmbd, n_epochs, 10)
             test_pred = predict_logistic(X_test, coef)
             accuracy += accuracy_score_numpy(test_pred, y_test)
-
-
-        NN = NeuralNetwork(X_train, y_train, epochs = 3000, batch_size = 50,
-            n_categories = 1, eta = eta, lmbd = lmb, n_hidden_neurons = [10,10], activation_function = actfunc)
-        NN.train()
-        y_tilde = NN.predict_reg(X_train)
-        y_predict = NN.predict_reg(X_test)
-        mse2 += mse(y_test.reshape(y_predict.shape), y_predict)
-
-
-    return mse2/k
-
-def scale_data(X1,X2, scale_type = StandardScaler, with_std=False):
-    try:
-        X1 =X1[:,1:]
-        X2 =X2[:,1:]
-        scaler = StandardScaler(with_std=with_std)
-        scaler.fit(X1)
-        X1 = scaler.transform(X1)
-        X2 = scaler.transform(X2)
-    except:
-        scaler = StandardScaler(with_std=False)
-        scaler.fit(X1.reshape(-1,1))
-        X1 = scaler.transform(X1.reshape(-1,1))
-        X2 = scaler.transform(X2.reshape(-1,1))
-        X1 =X1.flatten()
-        X2 =X2.flatten()
-
-    return X1, X2
+    return accuracy/k
