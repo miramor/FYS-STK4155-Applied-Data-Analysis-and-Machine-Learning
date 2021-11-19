@@ -73,13 +73,15 @@ for i,eta_ in enumerate(eta):
         r2_train[i,j] = r2_train_
         r2_test[i,j] = r2_test_
 
-        print(f"Eta: {eta_} | # of neurons: {n_}")
-        print(f"Training MSE: {mse_train_}")
-        print(f"Test MSE: {mse_test_}")
-        print(f"Training R2: {r2_train_}")
-        print(f"Test R2: {r2_test_}")
-        print("------------------------")
 
+        
+        print(f"Eta: {eta_} | # of neurons: {n_}")
+        #print(f"Training MSE: {mse_train_}")
+        #print(f"Test MSE: {mse_test_}")
+        #print(f"Training R2: {r2_train_}")
+        #print(f"Test R2: {r2_test_}")
+        print("------------------------")
+        
 
 #Produces heatmaps with MSE and R2 for both training and test set.
 make_heatmap(mse_train, n_neurons, eta, fn = f"mse_train_{af}_L{n_L}_neur_eta.pdf",
@@ -118,13 +120,14 @@ for i,eta_ in enumerate(eta):
         r2_train[i,j] = r2_train_
         r2_test[i,j] = r2_test_
 
+        """
         print(f"Eta: {eta_} | lambda: {lmb_}")
         print(f"Training MSE: {mse_train_}")
         print(f"Test MSE: {mse_test_}")
         print(f"Training R2: {r2_train_}")
         print(f"Test R2: {r2_test_}")
         print("------------------------")
-
+        """
 
 #Produces heatmaps with MSE and R2 for both training and test set.
 make_heatmap(mse_train, lambdas, eta, fn = f"mse_train_{af}_L1_lambda_eta.pdf",

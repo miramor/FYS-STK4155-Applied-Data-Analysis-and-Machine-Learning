@@ -51,24 +51,6 @@ actfunc = { #dictionary with the function name of the activation functions.
 af = "sigmoid"
 
 
-NN = NeuralNetwork(X_train, y_trainhot, epochs = 50, batch_size = 10,
-    n_categories = 2, eta = 0.01, lmbd = 0.001, n_hidden_neurons = [50,20,50], activation_function = actfunc[af])
-NN.train()
-NN.plot_accuracy(save=False, fn="pred_acc_eta1emin4")
-
-#Predicts on train and test data.
-y_tilde = NN.predict(X_train)
-y_predict = NN.predict(X_test)
-
-#Computes prediction accuracy
-train_score = accuracy_score_numpy(y_tilde, y_train)
-test_score = accuracy_score_numpy(y_predict, y_test)
-
-#Print results
-print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
-print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
-
-
 #2D arrays for storing prediction accuracies for different hyper parameters.
 train_accuracy = np.zeros((len(eta),len(lambdas)))
 test_accuracy = np.zeros_like(train_accuracy)
@@ -79,7 +61,7 @@ for i,eta_ in enumerate(eta):
         NN = NeuralNetwork(X_train, y_trainhot, epochs = 50, batch_size = 10,
             n_categories = 2, eta = eta_, lmbd = lmb_, n_hidden_neurons = [15,15], activation_function = actfunc[af])
         NN.train()
-        #NN.plot_accuracy() #uncomment to plot train accuracy for each epoch.
+        NN.plot_accuracy() #uncomment to plot train accuracy for each epoch.
         y_tilde = NN.predict(X_train)
         y_predict = NN.predict(X_test)
 
@@ -89,8 +71,8 @@ for i,eta_ in enumerate(eta):
         test_accuracy[i,j] = test_score
 
         print(f"Lambda: {lmb_} | Eta: {eta_}")
-        print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
-        print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
+        #print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
+        #print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
         print("------------------------")
 
 
@@ -121,10 +103,10 @@ for i,lmb_ in enumerate(lambdas):
         train_accuracy[i,j] = train_score
         test_accuracy[i,j] = test_score
 
-        print(f"Lambda: {lmb_} | # of neurons: {n_}")
-        print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
-        print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
-        print("------------------------")
+        #print(f"Lambda: {lmb_} | # of neurons: {n_}")
+        #print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
+        #print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
+        #print("------------------------")
 
 
 make_confusion_matrix(y_test, y_predict)
@@ -142,7 +124,7 @@ train_accuracy = np.zeros((len(eta),len(n_neurons)))
 test_accuracy = np.zeros_like(train_accuracy)
 for i,eta_ in enumerate(eta):
     for j,n_  in enumerate(n_neurons):
-        NN = NeuralNetwork(X_train, y_trainhot, epochs = 500, batch_size = 10,
+        NN = NeuralNetwork(X_train, y_trainhot, epochs = 50, batch_size = 10,
             n_categories = 2, eta = eta_, lmbd = lmb, n_hidden_neurons = [n_]*n_hl, activation_function = actfunc[af])
         NN.train()
         #NN.plot_accuracy() #uncomment to plot train accuracy for each epoch.
@@ -154,10 +136,10 @@ for i,eta_ in enumerate(eta):
         train_accuracy[i,j] = train_score
         test_accuracy[i,j] = test_score
 
-        print(f"Eta: {eta_} | # of neurons: {n_}")
-        print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
-        print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
-        print("------------------------")
+        #print(f"Eta: {eta_} | # of neurons: {n_}")
+        #print(f"Training accuracy: {accuracy_score_numpy(y_tilde, y_train)}")
+        #print(f"Test accuracy: {accuracy_score_numpy(y_predict, y_test)}")
+        #print("------------------------")
 
 
 make_confusion_matrix(y_test, y_predict)
@@ -175,6 +157,6 @@ from sklearn.neural_network import MLPClassifier
 plt.clf()
 clf = MLPClassifier(random_state=1, hidden_layer_sizes = (10,5,10), solver = "sgd", activation = "logistic", batch_size = 10, max_iter=150, learning_rate_init = 0.01, alpha = 0.001).fit(X_train, y_train)
 pred_nn = clf.predict(X_test)
-print(accuracy_score_numpy(pred_nn, y_test))
+print("Prediction accuracy SKlearn: ", accuracy_score_numpy(pred_nn, y_test))
 make_confusion_matrix(y_test, pred_nn, fn="cm_heatmapsklearn.pdf", title = "SKlearn Neural Network")
 cm_nn = confusion_matrix(y_test, pred_nn)
