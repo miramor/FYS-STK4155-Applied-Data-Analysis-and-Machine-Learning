@@ -40,7 +40,8 @@ class NeuralNetwork:
 
         self.act_func = activation_function
         self.output_activation = output_activation
-        self.performance = []
+
+        self.performance = [] #For storing performance after each epoch
 
     def create_biases_and_weights(self):
         self.hidden_weights = []
@@ -85,12 +86,10 @@ class NeuralNetwork:
 
     def backpropagation(self):
         error_output = (self.z_o - self.Y_data.reshape(self.z_o.shape))# * self.act_func(self.z_o, derivative = True)
-        #error_output = self.gradCostFunc(self.z_o, self.Y_data.reshape(self.z_o.shape))
 
         error_hidden = [0]*(self.n_layers-2)
-        error_hidden[0] = np.matmul(error_output, self.output_weights.T) *  self.act_func(self.z_h[-1], derivative = True) #self.a_h[-1] * (1 - self.a_h[-1])
+        error_hidden[0] = np.matmul(error_output, self.output_weights.T) *  self.act_func(self.z_h[-1], derivative = True)
         for i in range(1, self.n_layers-2):
-            #print(error_hidden[i-1].shape, self.hidden_weights[-i].shape, self.z_h[-i].shape)
             error_hidden[i] = np.matmul(error_hidden[i-1], self.hidden_weights[-i].T) * self.act_func(self.z_h[-i-1], derivative = True)
 
 
@@ -106,14 +105,12 @@ class NeuralNetwork:
             self.hidden_weights[i] -= self.eta * self.hidden_weights_gradient
             self.hidden_bias[i] -= self.eta * self.hidden_bias_gradient
 
-        #print(self.a_h[-1].shape, error_output.shape)
+
         self.output_weights_gradient = np.matmul(self.a_h[-1].T, error_output) + self.lmbd * self.output_weights
         self.output_bias_gradient = np.sum(error_output, axis=0)
 
         self.output_weights -= self.eta * self.output_weights_gradient
         self.output_bias -= self.eta * self.output_bias_gradient
-
-
 
 
     def predict(self, X):
@@ -127,6 +124,17 @@ class NeuralNetwork:
     def predict_reg(self, X):
         return self.feed_forward_out(X)
 
+    def plot_mse(self, save = False, fn = "mse_train.pdf"):
+        epochs = [i for i in range(len(self.performance))]
+        plt.plot(epochs, self.performance)
+        plt.xlabel("Epochs")
+        plt.ylabel("MSE")
+        plt.title("Mean squared error as function of epoch")
+        if save:
+            plt.savefig(fn, dpi = 400, bbox_inches='tight')
+        plt.show()
+
+
     def train(self):
         data_indices = np.arange(self.n_inputs)
 
@@ -134,8 +142,7 @@ class NeuralNetwork:
             for j in range(self.iterations):
                 #pick datapoints with replacement
                 chosen_datapoints = np.random.choice(
-                    data_indices, size=self.batch_size, replace=False
-                )
+                    data_indices, size=self.batch_size, replace=False)
 
                 # minibatch training data
                 self.X_data = self.X_data_full[chosen_datapoints]
@@ -143,5 +150,6 @@ class NeuralNetwork:
 
                 self.feed_forward()
                 self.backpropagation()
+
             y_tilde = self.predict_reg(self.X_data_full)
-            self.performance.append(mse(y_tilde, self.Y_data_full))
+            self.performance.append(mse(y_tilde[:,0], self.Y_data_full))

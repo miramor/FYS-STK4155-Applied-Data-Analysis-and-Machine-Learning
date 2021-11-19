@@ -7,14 +7,24 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib
-from NeuralNetworkReg import NeuralNetwork
 plt.style.use("seaborn")
 sns.set(font_scale=1.5)
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
-def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
+
+def SGD(X, y, M, epochs, gradCostFunc, beta, eta, gamma = 0, lmb = None, LS=False): #Stochastic Gradient Descent
+    """
+    Stochastic Gradient Descent.
+    Takes in number of epochs, gradient cost fucntion, initial beta values,
+    learning rate, momentum parameter and learning schedule.
+    
+    Returns new beta values.
+    """
+    
     n = len(X) #number of datapoints
     m = int(n/M) #number of mini-batch cycles (M: size of batch)
+    v_prev = 0
+    betaL = []
     for epoch in range(epochs):
         for i in range(m):
             random_index = np.random.randint(m)
@@ -24,15 +34,27 @@ def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradi
                 gradients = gradCostFunc(xi, yi, beta)
             else:
                 gradients = gradCostFunc(xi, yi, beta, lmb)
-            #eta = learningSchedule(epoch*m+i)
-            beta = beta - eta*gradients
-    return beta
+            if LS:
+                eta = learningSchedule(epoch*m+i)
+
+            v = gamma * v_prev + eta*gradients
+            beta = beta - v
+            v_prev = v
+        betaL.append(beta)
+
+    return beta, np.array(betaL)
 
 def gradCostRidge(X, y, beta, lmb): #returns gradient of Ridge cost function
+    """
+    Gradient of ridge cost function
+    """
     n = len(X)
     return 2/n * X.T @ (X @ beta - y) + 2*lmb*beta
 
 def gradCostOls(X, y, beta): #returns gradient of OLS cost function
+    """
+    Gradient of OLS cost function
+    """
     n = len(X)
     return 2/n * X.T @ (X @ beta - y)
 
@@ -42,6 +64,9 @@ def gradcostMSE(y_model, y): #returns gradient of OLS cost function
 
 
 def learningSchedule(t): #Returns learning rate eta
+    """
+    A learning schedule for scaling the learnign rate
+    """
     t0, t1 = 5, 50
     return t0/(t+t1)
 
@@ -55,6 +80,9 @@ def r2(y, y_model): #Calculates the R2 score for a model
     return 1 - n*mse(y,y_model)/np.sum((y-np.mean(y))**2)
 
 def createX(x, y, n): #Creates design matrix with data x,y and complexity n
+    """
+    Creates design matrix with degree n.
+    """
     if len(x.shape) > 1:
     	x = np.ravel(x)
     	y = np.ravel(y)
@@ -81,12 +109,21 @@ def predict(X, beta):
     return X @ beta
 
 def ols(X, y): #Finds optimal beta for the Ordinary Least Squares method
+    """
+    Ordinary Least Squares
+    """
     return np.linalg.pinv(X.T @ X) @ X.T @ y
 
 def ridge(X, y, lmb): #Finds optimal beta for Ridge
+    """
+    Ridge regression.
+    """
     return np.linalg.pinv(X.T @ X + lmb*np.identity(X.shape[1])) @ X.T @ y
 
 def SklearnSGD(X, y, epochs, penalty, eta, alpha = 0):
+    """
+    SKlearn stochastic gradient descent.
+    """
     sgdreg = SGDRegressor(max_iter=epochs, penalty = penalty,
                           eta0 = eta, learning_rate = 'constant', alpha = alpha, fit_intercept = False)
     sgdreg.fit(X, y)
@@ -101,6 +138,9 @@ def plotmseLR(MSE, LR):
     plt.show()
 
 def plotmseREL(MSE,LR,lmb):
+    """
+    Used for
+    """
     fig, ax = plt.subplots()
     x_vals = []
     y_vals = []
@@ -119,7 +159,10 @@ def plotmseREL(MSE,LR,lmb):
     plt.show()
 
 
-def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "", with_precision = False):
+def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylabel = "", with_precision = False, save = False):
+    """
+    Makes a heatmap for given x,y and z.
+    """
     fig, ax = plt.subplots()
     x_vals = []
     y_vals = []
@@ -134,10 +177,14 @@ def make_heatmap(z,x,y, fn = "defaultheatmap.pdf", title = "", xlabel = "", ylab
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    plt.savefig(fn, bbox_inches='tight')
+    if save:
+        plt.savefig(fn, bbox_inches='tight')
     plt.show()
 
-def make_confusion_matrix(y_true,y_predict, fn = "defaultcm.pdf", title = "", xlabel = "", ylabel = "" ):
+def make_confusion_matrix(y_true,y_predict, fn = "defaultcm.pdf", title = "", xlabel = "", ylabel = "", save = False):
+    """
+    Makes a cofusion matrix.
+    """
     plt.clf()
     cm = confusion_matrix(y_true,y_predict)
     ax= plt.subplot()
@@ -147,11 +194,12 @@ def make_confusion_matrix(y_true,y_predict, fn = "defaultcm.pdf", title = "", xl
     ax.set_xlabel('Predicted labels');ax.set_ylabel('True labels');
     ax.set_title(f'Confusion Matrix {title}');
     ax.xaxis.set_ticklabels(["0","1"]); ax.yaxis.set_ticklabels(["0","1"]);
-    plt.savefig(fn, dpi=400)
+    if save:
+        plt.savefig(fn, dpi=400)
     plt.show()
 
 
-def sigmoid(x, derivative = False): #sigmoid as activation Function
+def sigmoid(x, derivative = False):
     if derivative:
         return sigmoid(x)*(1-sigmoid(x))
     else:
@@ -182,6 +230,9 @@ def linear(x):
     return x
 
 def accuracy_score_numpy(Y_test, Y_pred):
+    """
+    Computes the prediction accuracy based on target value and test prediciton
+    """
     #print(f"This is Y_test: {Y_test}")
     #print(f"This is Y_pred: {Y_pred}")
     return np.sum(Y_test == Y_pred) / len(Y_test)
@@ -189,6 +240,9 @@ def accuracy_score_numpy(Y_test, Y_pred):
 
 
 def to_categorical_numpy(integer_vector):
+    """
+    Takes in integer array and returns a one-hot encoded array
+    """
     n_inputs = len(integer_vector)
     n_categories = np.max(integer_vector) + 1
     onehot_vector = np.zeros((n_inputs, n_categories))
@@ -198,6 +252,9 @@ def to_categorical_numpy(integer_vector):
 
 
 def predict_logistic(X, coef):
+    """
+    Predicts class. Used for logistic regression
+    """
     y_pred = X @ coef
     if max(abs(y_pred)) < 500:
         return np.around(1/(1+np.exp(-y_pred)))
@@ -219,6 +276,9 @@ def predict_logistic(X, coef):
 
 
 def gradLogistic(X, y, coef, lmbd):
+    """
+    Gradient of the logistic cost function.
+    """
     m = len(y)
     grad = (predict_logistic(X, coef) - y) @ X + lmbd * coef
     grad = (1/m)*grad
@@ -227,6 +287,9 @@ def gradLogistic(X, y, coef, lmbd):
 
 
 def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
+    """
+    Logistic regression using stochastic gradient descent
+    """
     n = len(X_train) #number of datapoints
     n_coef = len(X_train[0])
     coef = np.zeros(n_coef)
@@ -235,6 +298,9 @@ def logistic_reg(X_train, y_train, learn_rate, lmb, n_epochs, M):
     return coef
 
 def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-fold method for use in logistic regression,  X = X_train, z = z_train
+    """
+    K-fold for logistic regression
+    """
     mse_test = np.zeros(k) #for storing kfold samples' MSE for varying complexity (rows:complexity, columns:bootstrap sample)
     mse_train = np.zeros(k)
     r2_test = np.zeros(k)
@@ -262,3 +328,25 @@ def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-f
             test_pred = predict_logistic(X_test, coef)
             accuracy += accuracy_score_numpy(test_pred, y_test)
     return accuracy/k
+
+def scale_data(X1,X2, scale_type = StandardScaler, with_std=False):
+    """
+    Scales data. Default is SKlearn's StandardScaler without dividing by STD,
+    but can also use SKlearns MinMaxScaler and or divide by STD.
+    """
+    try:
+        X1 =X1[:,1:]
+        X2 =X2[:,1:]
+        scaler = StandardScaler(with_std=with_std)
+        scaler.fit(X1)
+        X1 = scaler.transform(X1)
+        X2 = scaler.transform(X2)
+    except:
+        scaler = StandardScaler(with_std=False)
+        scaler.fit(X1.reshape(-1,1))
+        X1 = scaler.transform(X1.reshape(-1,1))
+        X2 = scaler.transform(X2.reshape(-1,1))
+        X1 =X1.flatten()
+        X2 =X2.flatten()
+
+    return X1, X2
