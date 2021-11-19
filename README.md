@@ -26,6 +26,6 @@ One grid search is with learning rate and number of neurons per layer, and one i
 A lot of plots with MSE as a function of epochs will be shown too, to see the stability performance for different values of hyperparameters.
 ##### Classification using Wisconsin breast cancer data
 Running "d_NNclas.py" presents results from three grid searches when ran.
-The prediction accuracy on training data as a function of epochs on is also shown for one of the grid searches.
+The prediction accuracy on training data as a function of epochs is also shown for one of the grid searches.
 A confusion matrix with results from SKlearns prediction using SKlearn's neural network is also shown.
 
