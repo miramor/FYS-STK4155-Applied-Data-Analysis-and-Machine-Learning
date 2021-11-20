@@ -29,7 +29,7 @@ Running "d_NNclas.py" presents results from three grid searches when ran.
 The prediction accuracy on training data as a function of epochs is also shown for one of the grid searches.
 A confusion matrix with results from SKlearns prediction using SKlearn's neural network is also shown.
 
-##### Logistic regression using Wisconsin breast cancer data
+#### Logistic regression using Wisconsin breast cancer data
 Running "e_logreg.py" presents results from two grid searches when ran, one from own implementation and one from the sklearn implementation.
 A confusion matrix with results from SKlearns prediction using SKlearn's SGDClassifier and own implementation is also shown.
 
