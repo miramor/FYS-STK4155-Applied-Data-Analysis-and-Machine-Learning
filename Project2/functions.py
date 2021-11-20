@@ -316,7 +316,7 @@ def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-f
             y_train = np.concatenate((y[:(j)*split], y[(j+1)*split:]))
             y_test = y[j*split:(j+1)*split]
         if sklearn:
-            clf = SGDClassifier(loss="log", penalty="l2", learning_rate = "constant", eta0 = eta, alpha = lmbd, max_iter=n_epochs).fit(X_train, y_train)
+            clf = SGDClassifier(loss="log", penalty="l2", learning_rate = "constant", eta0 = eta, alpha = lmbd, max_iter=n_epochs, tol=1E-3).fit(X_train, y_train)
             pred_sklearn = clf.predict(X_test)
             accuracy += accuracy_score_numpy(pred_sklearn, y_test)
         else:
