@@ -10,7 +10,7 @@ The folder UploadedFigures contains all the plots created when running the exerc
 By simply running the files for each exercise, all of the results in our report are reproduced.
 
 ### Project 2: Classification and Regression, from Linear and Logistic Regression to Neural Networks
-In this project we have made our own implementation of stochastic gradient descent (SGD) and feed forward neural network using SGD.
+In this project we have made our own implementation of stochastic gradient descent (SGD), feed forward neural network and logsitic reggresion, both of which use SGD.
 We have one file "functions.py" containing a handful of the functions used in this project. 
 There is a seperate file for most of the exercises. There are two classes for the neural network code,
 one for regression and one for classification.
