@@ -139,3 +139,10 @@ make_heatmap(r2_train, lambdas, eta, fn = f"r2_train_{af}_L1_lambda_eta.pdf",
 make_heatmap(r2_test, lambdas, eta, fn = f"r2_test_{af}_L1_lambda_eta.pdf",
             xlabel = "Regularization parameter $\lambda$", ylabel = "Learning rate $\eta$", title = "R2 test set")
 
+#SKlearns neural network using multi-layer perception regressor
+sketa = 0.01
+clf = MLPRegressor(random_state=1, hidden_layer_sizes = (15), solver = "sgd", activation = "relu", batch_size = 50, max_iter=5000, learning_rate_init = sketa, alpha = 0.0001).fit(X_train, y_train)
+pred_nn = clf.predict(X_test)
+print(f"Sklearn results using 15 neurons for one hidden layer and relu as activation function with eta = {sketa}")
+print("R2", r2(y_test, pred_nn))
+print("MSE", mse(y_test, pred_nn))
