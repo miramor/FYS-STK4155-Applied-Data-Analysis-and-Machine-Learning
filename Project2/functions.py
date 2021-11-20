@@ -321,7 +321,7 @@ def kfold_logistic(X,y,k, lmbd, eta, n_epochs, sklearn = False): #Implements k-f
             accuracy += accuracy_score_numpy(pred_sklearn, y_test)
         else:
             coef = logistic_reg(X_train, y_train, eta, lmbd, n_epochs, 10)
-            test_pred = predict_logistic(X_test, coef[1])
+            test_pred = predict_logistic(X_test, coef)
 
             accuracy += accuracy_score_numpy(test_pred, y_test)
     return accuracy/k
