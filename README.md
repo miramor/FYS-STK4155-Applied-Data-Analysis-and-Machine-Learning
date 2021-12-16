@@ -43,7 +43,7 @@ We have, for this project, decided to just remove these values since we will sti
 Predictions are done using a feed forward neural network, decision trees and random forest with bagging and boosting.
 
 ### Feed Forward Neural forward network
-#### Self implemented gridsearch
+#### Self-implemented gridsearch
 In NNOwn.py, a self-implemented grid search is performed using MLPClassifier. 
 For each test, the mean accuracy is calculated using stratified kfold with k=5 folds and the results are displayed either in a heatmap or a simple graph.
 The tests can be run consecutively, using the optimal parameters from the previous searches.
@@ -54,11 +54,11 @@ Test 4: Run over epochs and batch size for different solvers.
 
 Finally, a prediction of the validation-accuracy is performed using the MLPClassifier with optimized parameters.
 A confusion matrix and metric scores are also shown.
-For plotting, some functions are imported from 'functions1.py'. 
+For plotting, some functions are imported from `functions1.py`. 
 
 **How to use**: 
 The following packages must be installed: sklearn, pandas, numpy, matplotlib and seaborn.
-Simple write 'NNOwn.py' into the terminal.
+Simple write `NNOwn.py` into the terminal.
 By default all test will be run.
 
 #### Scikit-learn's Gridsearch
@@ -77,7 +77,7 @@ Results for each paramter combination are printed to the terminal in latex-forma
 
 **How to use**: 
 The following packages must be installed: sklearn, keras, pandas, numpy, matplotlib, os and seaborn.
-Simpy write 'NNGS.py' into the terminal.
+Simpy write `NNGS.py` into the terminal.
 By default only Test 1 will be run. To run Test 2, change Test 2 = False to True.
 Similarly, change boolean for the respective test to run any one of the other tests.
 The gridsearch can take some time.
