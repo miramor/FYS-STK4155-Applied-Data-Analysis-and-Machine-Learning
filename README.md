@@ -42,8 +42,8 @@ There are a total of 3276 samples in this set, but 1265 of these samples have at
 We have, for this project, decided to just remove these values since we will still have a total of 2011 samples.
 Predictions are done using a feed forward neural network, decision trees and random forest with bagging and boosting.
 
-### Feed Forward Neural forward network
-#### Self-implemented gridsearch
+### Feed Forward Neural Network
+#### Self-implemented Gridsearch
 In NNOwn.py, a self-implemented grid search is performed using MLPClassifier. 
 For each test, the mean accuracy is calculated using stratified kfold with k=5 folds and the results are displayed either in a heatmap or a simple graph.
 The tests can be run consecutively, using the optimal parameters from the previous searches.
