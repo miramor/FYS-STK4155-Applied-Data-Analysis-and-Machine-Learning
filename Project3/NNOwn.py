@@ -209,7 +209,7 @@ if Test4:
 #optimal_epoch_test = 150
 #optimal_hneurons = (10,)
 
-#Computing test accuracy of FNN with optimized parameters from grid search
+#Computing validation accuracy of FNN with optimized parameters from grid search
 clf = MLPClassifier(hidden_layer_sizes=optimal_hneurons, activation="relu",solver="adam",
                     alpha=optimal_lmd_test, batch_size= 50, learning_rate_init=optimal_eta_test,  max_iter=optimal_epoch_test, momentum=0, random_state=1).fit(X_train, y_train)
 y_pred = clf.predict(X_val)
