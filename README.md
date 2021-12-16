@@ -34,16 +34,16 @@ Running "e_logreg.py" presents results from two grid searches when ran, one from
 A confusion matrix with results from SKlearns prediction using SKlearn's SGDClassifier and own implementation is also shown.
 
 
-# Water Quality Predicition
+## Project 3: Water Quality Predicition
 
 In this project we predict the water-potabilty given the data [Water-Potability](https://www.kaggle.com/adityakadiwal/water-potability).
 The data is split into two categories, the water is either potable (1) or non-potable (0). Hence, we have a binary classification problem.
-There are a total of $3276$ samples in this set, but $1265$ of these samples have at least one missing feature value.
-We have, for this project, decided to just remove these values since we will still have a total of $2011$ samples.
+There are a total of 3276 samples in this set, but 1265 of these samples have at least one missing feature value.
+We have, for this project, decided to just remove these values since we will still have a total of 2011 samples.
 Predictions are done using a feed forward neural network, decision trees and random forest with bagging and boosting.
 
-## Feed Forward Neural forward network
-### Self implemented gridsearch
+### Feed Forward Neural forward network
+#### Self implemented gridsearch
 In NNOwn.py, a self-implemented grid search is performed using MLPClassifier. 
 For each test, the mean accuracy is calculated using stratified kfold with k=5 folds and the results are displayed either in a heatmap or a simple graph.
 The tests can be run consecutively, using the optimal parameters from the previous searches.
@@ -61,7 +61,7 @@ The following packages must be installed: sklearn, pandas, numpy, matplotlib and
 Simple write 'NNOwn.py' into the terminal.
 By default all test will be run.
 
-### Scikit-learn's Gridsearch
+#### Scikit-learn's Gridsearch
 In NNGS.py, sklearn's grid search is used, utilizing either MLPClassifier or KerasClassifer.
 Again, the mean accuracy is computed using cross validation with k=5 folds.
 The gridsearch using MLP Classifier examines optimized exponential decay rates for the adam solver.
