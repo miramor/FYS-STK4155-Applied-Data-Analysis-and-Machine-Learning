@@ -50,7 +50,7 @@ The tests can be run consecutively, using the optimal parameters from the previo
 Test 1: Run over learning rate and regularization parameters\
 Test 2: Run over learning rate and epochs\
 Test 3: Run over number of hidden layers and activation function\
-Test 4: Run over epochs and batch size for different solvers\
+Test 4: Run over epochs and batch size for different solvers
 
 Finally, a prediction of the validation-accuracy is performed using the MLPClassifier with optimized parameters.
 A confusion matrix and metric scores are also shown.
@@ -68,10 +68,10 @@ The gridsearch using MLP Classifier examines optimized exponential decay rates f
 The gridsearch using the KerasClassifier consists in total of six test. The test can be run independently.\
 Test 1: Running over different solvers (sgd, RMSprop, adagrad, adam)\
 Test 2: Running over learning rate and epochs\
-Test 3: Running over kernel initializer \
+Test 3: Running over kernel initializer\
 Test 4: Running over activation functions\ 
 Test 5: Running over weigth constraint and droput rate\
-Test 6: Running over neurons, epochs and batch size\
+Test 6: Running over neurons, epochs and batch size
 
 Results for each paramter combination are printed to the terminal in latex-format.
 
