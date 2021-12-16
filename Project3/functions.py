@@ -2,35 +2,52 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import SGDRegressor
 from sklearn.linear_model import SGDClassifier
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
+import pandas as pd
+from tqdm import tqdm
+from sklearn.model_selection import train_test_split
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from sklearn.linear_model import Lasso
+from sklearn import linear_model
+from imageio import imread
+from inspect import CO_VARARGS
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, Lasso, Ridge
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVR
+from mlxtend.evaluate import bias_variance_decomp
+
+plt.style.use("seaborn")
+sns.set(font_scale=1.5)
+plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
 
 def create_X(x, y, n ): #Creates design matrix with data x,y and complexity n
     if len(x.shape) > 1:
-    	x = np.float(np.ravel(x))
-    	y = np.float(np.ravel(y))
+    	x = np.ravel(x)
+    	y = np.ravel(y)
 
-    print(type(x[0]))
     N = len(x)
     l = int((n+1)*(n+2)/2)		# Number of elements in beta
     X = np.ones((N,l))
 
     for i in range(1,n+1):
-    	q = int((i)*(i+1)/2)
-    	for k in range(i+1):
-            if i-k > 49:
-                pass
-                #print(len(str((499**49))))
-            if np.max(x**(i-k)) > 499**10:
-                pass
-                #print("Too big?")
-    		
+        q = int((i)*(i+1)/2)
+        for k in range(i+1):
             X[:,q+k] = (x**(i-k))*(y**k)
+            #if np.min((x**(i-k))*(y**k)) < 0:
+                #print(i,q, i-k,np.min(y**k), np.max((x**(i-k))*(y**k)), np.min((x**(i-k))*(y**k)))
 
     return X
+
 
 def scale_data(X1,X2, scale_type = StandardScaler):
     try:
@@ -61,22 +78,6 @@ def r2(y, y_model): #Calculates the R2 score for a model
     n = len(y)
     return 1 - n*mse(y,y_model)/np.sum((y-np.mean(y))**2)
 
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import MaxAbsScaler
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from mpl_toolkits.mplot3d import Axes3D
-from sklearn.linear_model import Lasso
-from sklearn import linear_model
-from imageio import imread
-
-plt.style.use("ggplot")
-sns.set(font_scale=1.5)
-plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 18; plt.rcParams["xtick.labelsize"] = 18; plt.rcParams["ytick.labelsize"] = 18; plt.rcParams["legend.fontsize"] = 18
 
 def SGD(X, y, M, epochs, gradCostFunc, beta, eta, lmb = None): #Stochastic Gradient Descent
     n = len(X) #number of datapoints

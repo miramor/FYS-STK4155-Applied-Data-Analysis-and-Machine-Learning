@@ -1,43 +1,55 @@
+from inspect import CO_VARARGS
+from os import replace
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, Lasso, Ridge
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVR
+from tqdm import tqdm
+from multiprocessing import Process
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+plt.rcParams["figure.figsize"]=12,12
 import importlib
 import functions
 import NNReg
 importlib.reload(functions); importlib.reload(NNReg)
 from NNReg import NeuralNetwork
 from functions import *
-from sklearn.exceptions import ConvergenceWarning, DataConversionWarning
-
+from mlxtend.evaluate import bias_variance_decomp
+from sklearn.exceptions import DataConversionWarning
 warnings.filterwarnings(action='ignore', category=DataConversionWarning)
-warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
-data = imread('SRTM_data_Norway_1.tif') #All data
-terrain = data[:50,-50:] #Subset
-Y = terrain.ravel() #1d array of subset
-np.random.seed(42)
-dim = terrain.shape
-x1,x2 = np.meshgrid(range(dim[0]), range(dim[1]))
-X1 = x1.ravel().astype(np.float)
-X2 = x2.ravel().astype(np.float)
 
-#Scale variables
-#X1_scaled, X2_scaled = scale_data(X1,X2)
+df = pd.read_csv('./CASP.csv', sep = ",")
 
-#Set up design matrix
-#X1, X2 = scale_data(X1, X2)
-
-X = create_X(X1, X2, 50)
+features = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9']
 
 
+#Non linear terms
+for d in range(2,6):
+    for feat in features:
+        df.insert(len(df.columns), feat+f'_{d}',df[feat]**d)
 
-X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size=0.2)
+X = np.array(df.loc[:, df.columns != "RMSD"])
+y = np.array(df.loc[:, df.columns == "RMSD"])
 
-X_train, X_test = scale_data(X_train, X_test)
-Y_train, Y_test = scale_data(Y_train, Y_test)
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.3)
+
+#X_train, X_test = scale_data(X_train, X_test)
+#y_train, y_test = scale_data(y_train.reshape(len(y_train)), y_test.reshape(len(y_test)))
+
 
 
 def BVT_OLS(X_train, X_test, y_train, y_test, nb = 100, plot = False):
-    complexity = X_train.shape[1]
-    degree = int((-3+np.sqrt(9-8*(1-complexity)))/2)
+    degree = X_train.shape[1]
+
     Loss = np.zeros(degree)
     Variance = np.zeros(degree)
     Bias = np.zeros(degree)
@@ -54,33 +66,20 @@ def BVT_OLS(X_train, X_test, y_train, y_test, nb = 100, plot = False):
         Bias[d-1] = avg_bias
     
     if plot:
-        plt.plot(range(1,degree+1), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(range(1,degree+1), Variance, 'o-', label = "Variance")
-        plt.plot(range(1,degree+1), Loss, 'o-', label = "Loss")
+        plt.plot(range(1,degree+1), Bias, label = "Bias$^2$")
+        plt.plot(range(1,degree+1), Variance, label = "Variance")
+        plt.plot(range(1,degree+1), Loss, label = "Loss")
         plt.xlabel("Polynomial Degree")
         plt.ylabel("Error")
         plt.title("OLS Bias-Variance Trade Off")
-        plt.ylim(0,0.2)
+        #plt.ylim(0,0.2)
         #plt.xlim(0,40)
         plt.legend()
         plt.savefig('bv_tradeoff_ols.pdf', dpi = 400, bbox_inches = 'tight')
         plt.show()
 
-        plt.plot(range(1,degree+1), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(range(1,degree+1), Variance, 'o-', label = "Variance")
-        plt.plot(range(1,degree+1), Loss, 'o-', label = "Loss")
-        plt.xlabel("Polynomial Degree")
-        plt.ylabel("Error")
-        plt.title("OLS Bias-Variance Trade Off")
-        plt.ylim(0,0.05)
-        #plt.xlim(0,40)
-        plt.legend()
-        plt.savefig('bv_tradeoff_ols_close.pdf', dpi = 400, bbox_inches = 'tight')
-        plt.show()
-
 def BVT_Ridge(X_train, X_test, y_train, y_test, nb = 100, plot = False):
-    complexity = X_train.shape[1]
-    degree = int((-3+np.sqrt(9-8*(1-complexity)))/2)
+    degree = X_train.shape[1]
     Loss = np.zeros(degree)
     Variance = np.zeros(degree)
     Bias = np.zeros(degree)
@@ -97,33 +96,20 @@ def BVT_Ridge(X_train, X_test, y_train, y_test, nb = 100, plot = False):
         Bias[d-1] = avg_bias
     
     if plot:
-        plt.plot(range(1,degree+1), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(range(1,degree+1), Variance, 'o-', label = "Variance")
-        plt.plot(range(1,degree+1), Loss, 'o-', label = "Loss")
+        plt.plot(range(1,degree+1), Bias, label = "Bias$^2$")
+        plt.plot(range(1,degree+1), Variance, label = "Variance")
+        plt.plot(range(1,degree+1), Loss, label = "Loss")
         plt.xlabel("Polynomial Degree")
         plt.ylabel("Error")
         plt.title("Ridge Bias-Variance Trade Off")
-        plt.ylim(0,0.02)
+        #plt.ylim(0,0.02)
         #plt.xlim(0,40)
         plt.legend()
         plt.savefig('bv_tradeoff_ridge.pdf', dpi = 400, bbox_inches = 'tight')
-        plt.show()
-        
-        plt.plot(range(1,degree+1), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(range(1,degree+1), Variance, 'o-', label = "Variance")
-        plt.plot(range(1,degree+1), Loss, 'o-', label = "Loss")
-        plt.xlabel("Polynomial Degree")
-        plt.ylabel("Error")
-        plt.title("Ridge Bias-Variance Trade Off")
-        plt.ylim(0,0.01)
-        #plt.xlim(0,40)
-        plt.legend()
-        plt.savefig('bv_tradeoff_ridge_close.pdf', dpi = 400, bbox_inches = 'tight')
         plt.show() 
 
 def BVT_Lasso(X_train, X_test, y_train, y_test, nb = 100, plot = False):
-    complexity = X_train.shape[1]
-    degree = int((-3+np.sqrt(9-8*(1-complexity)))/2)
+    degree = X_train.shape[1]
     Loss = np.zeros(degree)
     Variance = np.zeros(degree)
     Bias = np.zeros(degree)
@@ -131,7 +117,7 @@ def BVT_Lasso(X_train, X_test, y_train, y_test, nb = 100, plot = False):
     for d in tqdm(range(1, degree + 1)):
 
         c = int((d+1)*(d+2)/2)
-        regr = Lasso(alpha = 0.000005, max_iter=1000, tol = 1e-3, fit_intercept=False)
+        regr = Lasso(alpha = 0.01, max_iter=5000, fit_intercept=False)
         avg_expected_loss, avg_bias, avg_var = bias_variance_decomp(
             regr, X_train[:,1:c], y_train, X_test[:,1:c], y_test, loss='mse', num_rounds = nb)
 
@@ -140,28 +126,16 @@ def BVT_Lasso(X_train, X_test, y_train, y_test, nb = 100, plot = False):
         Bias[d-1] = avg_bias
     
     if plot:
-        plt.plot(range(1,degree+1), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(range(1,degree+1), Variance, 'o-', label = "Variance")
-        plt.plot(range(1,degree+1), Loss, 'o-', label = "Loss")
+        plt.plot(range(1,degree+1), Bias, label = "Bias$^2$")
+        plt.plot(range(1,degree+1), Variance, label = "Variance")
+        plt.plot(range(1,degree+1), Loss, label = "Loss")
         plt.xlabel("Polynomial Degree")
         plt.ylabel("Error")
         plt.title("Lasso Bias-Variance Trade Off")
         #plt.ylim(0,0.4)
         #plt.xlim(0,40)
-        plt.legend()
         plt.savefig('bv_tradeoff_lasso.pdf', dpi = 400, bbox_inches = 'tight')
-        plt.show() 
-
-        plt.plot(range(1,degree+1), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(range(1,degree+1), Variance, 'o-', label = "Variance")
-        plt.plot(range(1,degree+1), Loss, 'o-', label = "Loss")
-        plt.xlabel("Polynomial Degree")
-        plt.ylabel("Error")
-        plt.title("Lasso Bias-Variance Trade Off")
-        plt.ylim(0,0.02)
-        #plt.xlim(0,40)
         plt.legend()
-        plt.savefig('bv_tradeoff_lasso_close.pdf', dpi = 400, bbox_inches = 'tight')
         plt.show() 
 
 def BVT_DT(X_train, X_test, y_train, y_test, nb = 100, plot = False):
@@ -181,26 +155,26 @@ def BVT_DT(X_train, X_test, y_train, y_test, nb = 100, plot = False):
         Bias[c] = avg_bias
     
     if plot:
-        plt.plot(np.log2(leaf), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(np.log2(leaf), Variance, 'o-', label = "Variance")
-        plt.plot(np.log2(leaf), Loss, 'o-', label = "Loss")
+        plt.plot(np.log2(leaf), Bias, label = "Bias$^2$")
+        plt.plot(np.log2(leaf), Variance, label = "Variance")
+        plt.plot(np.log2(leaf), Loss, label = "Loss")
         plt.xlabel("log2(Leaves)")
         plt.ylabel("Error")
         plt.title("Decision Tree Bias-Variance Trade Off")
-        plt.ylim(0,0.05)
+        #plt.ylim(0,0.05)
         #plt.xlim(0,40)
         plt.legend()
         plt.savefig('bv_tradeoff_dt.pdf', dpi = 400, bbox_inches = 'tight')
         plt.show() 
 
 def BVT_NN(X_train, X_test, y_train, y_test, nb = 100, plot = False):
-    complexity = 9
-    n = 20
-    Loss = np.zeros(n)
-    Variance = np.zeros(n)
-    Bias = np.zeros(n)
-    nodes = np.logspace(0,complexity-1, n, base = 2).astype(int)
-    for c in tqdm(range(n)):
+    complexity = 10
+    Loss = np.zeros(complexity)
+    Variance = np.zeros(complexity)
+    Bias = np.zeros(complexity)
+    
+    nodes = np.logspace(0,complexity-1, complexity, base = 2).astype(int)
+    for c in tqdm(range(complexity)):
 
         regr = MLPRegressor(learning_rate_init=0.1,hidden_layer_sizes=(nodes[c],nodes[c]) , max_iter=10000)
         avg_expected_loss, avg_bias, avg_var = bias_variance_decomp(
@@ -211,28 +185,16 @@ def BVT_NN(X_train, X_test, y_train, y_test, nb = 100, plot = False):
         Bias[c] = avg_bias
     
     if plot:
-        plt.plot(np.log2(nodes), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(np.log2(nodes), Variance, 'o-', label = "Variance")
-        plt.plot(np.log2(nodes), Loss, 'o-', label = "Loss")
+        plt.plot(np.log2(nodes), Bias, label = "Bias$^2$")
+        plt.plot(np.log2(nodes), Variance, label = "Variance")
+        plt.plot(np.log2(nodes), Loss, label = "Loss")
         plt.xlabel("log2(Nodes)")
         plt.ylabel("Error")
         plt.title("Neural Network Bias-Variance Trade Off")
-        plt.ylim(0,0.2)
+        ##plt.ylim(0,0.2)
         #plt.xlim(0,40)
-        plt.legend()
         plt.savefig('bv_tradeoff_nn.pdf', dpi = 400, bbox_inches = 'tight')
-        plt.show()
-        
-        plt.plot(np.log2(nodes), Bias, 'o-', label = "Bias$^2$")
-        plt.plot(np.log2(nodes), Variance, 'o-', label = "Variance")
-        plt.plot(np.log2(nodes), Loss, 'o-', label = "Loss")
-        plt.xlabel("log2(Nodes)")
-        plt.ylabel("Error")
-        plt.title("Neural Network Bias-Variance Trade Off")
-        plt.ylim(0,0.025)
-        #plt.xlim(0,40)
         plt.legend()
-        plt.savefig('bv_tradeoff_nn_close.pdf', dpi = 400, bbox_inches = 'tight')
         plt.show() 
 
 
@@ -272,21 +234,28 @@ def BVT_SVM(X_train, X_test, y_train, y_test, nb = 100, plot = False):
 
 
 
-
+def runInParallel(*fns):
+  proc = []
+  for fn in fns:
+    p = Process(target=fn)
+    p.start()
+    proc.append(p)
+  for p in proc:
+    p.join()
 
 if __name__ == '__main__':
-    #BVT_OLS(X_train[:,:int(21*22/2)], X_test[:,:int(21*22/2)], Y_train, Y_test, nb=300, plot=True)
-    #BVT_Ridge(X_train, X_test, Y_train, Y_test, nb=300, plot=True)   
-    #BVT_NN(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb=100, plot=True)
-    BVT_Lasso(X_train[:,:int(41*42/2)], X_test[:,:int(41*42/2)], Y_train, Y_test, nb=100, plot=True)
-    #BVT_SVM(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb=5, plot=True)
-    #BVT_DT(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb=10, plot=True)
-    
-
-#fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-#ax.plot_surface(x1,x2,terrain)
-#ax.view_init(20,-20)
-#plt.show()
-
-
-
+    pass
+    #__spec__ = None
+    #runInParallel(callOLS, callRidge, callDT)
+    #OLS_bs(X_train[:,:int(21*20/2)], X_test[:,:int(21*20/2)], Y_train, Y_test, nb=100, plot=True)
+    #Ridge_bs(X_train, X_test, Y_train, Y_test, nb=5, plot=True)
+    #Lasso_bs(X_train, X_test, Y_train, Y_test, nb=1, plot=True)
+    #NN_bs(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb = 1, plot=True)
+    #DecisionTree_bs(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb = 5, plot=True)
+    #SVM_bs(X_train , X_test , y_train , y_test , nb = 10, plot=True)
+    #BVT_OLS(X_train, X_test, y_train, y_test, nb=50, plot=True)
+    #BVT_Ridge(X_train, X_test, y_train, y_test, nb=50, plot=True)   
+    #BVT_Lasso(X_train, X_test, y_train, y_test, nb=10, plot=True)
+    BVT_NN(X_train[:,:9], X_test[:,:9], y_train, y_test, nb=10, plot=True)
+    #BVT_SVM(X_train[:,1:3], X_test[:,1:3], y_train, y_test, nb=5, plot=True)
+    #BVT_DT(X_train[:,1:3], X_test[:,1:3], y_train, y_test, nb=10, plot=True)
