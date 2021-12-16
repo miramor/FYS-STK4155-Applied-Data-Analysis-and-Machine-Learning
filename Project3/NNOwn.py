@@ -222,13 +222,13 @@ if Test4:
     plt.savefig("Solver.pdf",bbox_inches='tight')
     plt.show()
 
-#When not running tests use these parameters
+#When not running tests use these parameters for MLPClassifier below
 optimal_lmd_test = 0.00023713737056616554
 optimal_eta_test = 0.1
 optimal_epoch_test = 150
 optimal_hneurons = (10,)
 
-#Computing test accuracy of FNN with optimal parameters from grid search
+#Computing test accuracy of FNN with optimized parameters from grid search
 clf = MLPClassifier(hidden_layer_sizes=optimal_hneurons, activation="relu",solver="adam",
                     alpha=optimal_lmd_test, batch_size= 50, learning_rate_init=optimal_eta_test,  max_iter=optimal_epoch_test, momentum=0, random_state=1).fit(X_train, y_train)
 y_pred = clf.predict(X_val)
@@ -236,15 +236,4 @@ make_confusion_matrix(y_val, y_pred, fn="ConfusionMatrixOwn.pdf", save=True)
 print(classification_report(y_val,y_pred))
 print(accuracy_score(y_val, y_pred))
 
-"""
-              precision    recall  f1-score   support
 
-           0       0.71      0.84      0.77       246
-           1       0.64      0.45      0.53       156
-
-    accuracy                           0.69       402
-   macro avg       0.67      0.64      0.65       402
-weighted avg       0.68      0.69      0.67       402
-
-0.6865671641791045
-"""
