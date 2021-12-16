@@ -69,7 +69,7 @@ The gridsearch using the KerasClassifier consists in total of six test. The test
 Test 1: Running over different solvers (sgd, RMSprop, adagrad, adam)\
 Test 2: Running over learning rate and epochs\
 Test 3: Running over kernel initializer\
-Test 4: Running over activation functions\ 
+Test 4: Running over activation functions   
 Test 5: Running over weigth constraint and droput rate\
 Test 6: Running over neurons, epochs and batch size
 
