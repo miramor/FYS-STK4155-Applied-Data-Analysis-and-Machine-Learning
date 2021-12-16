@@ -37,13 +37,13 @@ A confusion matrix with results from SKlearns prediction using SKlearn's SGDClas
 ## Project 3: Water Quality Predicition
 
 In this project we predict the water-potabilty given the data [Water-Potability](https://www.kaggle.com/adityakadiwal/water-potability).
-The data is split into two categories, the water is either potable (1) or non-potable (0). Hence, we have a binary classification problem. Additionally, the data set consits of nine features: pH, hardness [mg/L], solids [ppm], chloramines [ppm], sulfate [mg/L], conductivity [&micro; S/cm], organic carbon [ppm], trihalmoethanes [&micro; g/L], and turbidity [NTU].
+The data is split into two categories, the water is either potable (1) or non-potable (0). Hence, we have a binary classification problem. Additionally, the data set consits of nine features: pH, hardness [mg/L], solids [ppm], chloramines [ppm], sulfate [mg/L], conductivity [&micro;S/cm], organic carbon [ppm], trihalmoethanes [&micro;g/L], and turbidity [NTU].
 
 There are a total of 3276 samples in this set, but 1265 of these samples have at least one missing feature value.
 We have, for this project, decided to just remove these values since we will still have a total of 2011 samples.
 Predictions are done using a feed forward neural network, decision trees and random forest with bagging and boosting.
 
-**How to use**: Download the dataset here: [Water-Potability](https://www.kaggle.com/adityakadiwal/water-potability).\ 
+**How to use**: Download the dataset here: [Water-Potability](https://www.kaggle.com/adityakadiwal/water-potability).  
 Running `DataAnalysis.py` will show a pie chart of the potable water distribution, a histogram, a correlation matrix and three box plots for the nine features.
 
 ### Feed Forward Neural Network
