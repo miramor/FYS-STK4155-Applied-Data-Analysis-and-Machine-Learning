@@ -24,25 +24,6 @@ df = df.dropna() #remove all rows with NaN
 df2 = df.drop(["Potability"], axis=1) # design matrix
 X = np.array(df2)
 
-"""
-#sns.set(font_scale=1)
-corr=df2.corr()
-plt.figure(figsize=(12,12))
-sns.heatmap(corr, annot=True)
-plt.title("Correlation Matrix")
-#plt.savefig("potable_corr.pdf",bbox_inches='tight')
-plt.savefig("potable_corr.pdf", bbox_inches='tight')
-plt.show()
-
-
-fig = plt.figure(figsize = (12,12))
-ax = fig.gca()
-df2.hist(ax=ax, xlabelsize=21, ylabelsize=21)
-plt.title("Feature distribution")
-plt.savefig("potable_hist.pdf", dpi=400, bbox_inches='tight')
-plt.show()
-"""
-
 y = np.array(df["Potability"]) #Targets
 
 #Train-validation-test split
@@ -72,10 +53,10 @@ X_k = scaler.transform(X_k)
 The grid search is divided into four tests. True or False to determine whether a test should be performed.
 The tests can be run consecutively using the optimal parameters from the previous test.
 """
-Test1=False
-Test2 = False
-Test3 = False
-Test4 = False
+Test1=True
+Test2 = True
+Test3 = True
+Test4 = True
 
 #Test running over learning rate and regularization parameter
 if Test1:
@@ -223,10 +204,10 @@ if Test4:
     plt.show()
 
 #When not running tests use these parameters for MLPClassifier below
-optimal_lmd_test = 0.00023713737056616554
-optimal_eta_test = 0.1
-optimal_epoch_test = 150
-optimal_hneurons = (10,)
+#optimal_lmd_test = 0.00023713737056616554
+#optimal_eta_test = 0.1
+#optimal_epoch_test = 150
+#optimal_hneurons = (10,)
 
 #Computing test accuracy of FNN with optimized parameters from grid search
 clf = MLPClassifier(hidden_layer_sizes=optimal_hneurons, activation="relu",solver="adam",
