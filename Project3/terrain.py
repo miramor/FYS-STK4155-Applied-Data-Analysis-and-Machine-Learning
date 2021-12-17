@@ -5,26 +5,6 @@ from functions import *
 np.random.seed(42)
 
 
-#Read data
-data = imread('SRTM_data_Norway_1.tif') #All data
-terrain = data[:50,-50:] #Subset
-Y = terrain.ravel() #1d array of subset
-dim = terrain.shape
-x1,x2 = np.meshgrid(range(dim[0]), range(dim[1]))
-X1 = x1.ravel().astype(np.float)
-X2 = x2.ravel().astype(np.float)
-
-#Create design matrix of 2D polynomials using X1 and X2
-X = create_X(X1, X2, 50)
-
-#Split into train and test set
-X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size=0.2)
-
-#Scale data
-X_train, X_test = scale_data(X_train, X_test)
-Y_train, Y_test = scale_data(Y_train, Y_test)
-
-
 def BVT_OLS(X_train, X_test, y_train, y_test, nb = 100, plot = False):
     #Bias-Variance trade off with OLS
     complexity = X_train.shape[1]
@@ -295,14 +275,33 @@ def BVT_regterm(X_train, X_test, y_train, y_test, degrees = [20], alphas = [0.01
 
 
 if __name__ == '__main__':
-    #BVT_OLS(X_train[:,:int(21*22/2)], X_test[:,:int(21*22/2)], Y_train, Y_test, nb=500, plot=True)
-    #BVT_Ridge(X_train, X_test, Y_train, Y_test, nb=500, plot=True)   
-    #BVT_DT(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb=300, plot=True)
-    #BVT_Lasso(X_train, X_test, Y_train, Y_test, nb=200, plot=True)
-    #BVT_NN(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb=100, plot=True)
-    #BVT_SVM(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb=5, plot=True)
-    #BVT_regterm(X_train, X_test, Y_train, Y_test, degrees = [20,30,40], alphas = np.logspace(-5,0,6), nb=50, plot=True)
-    #BVT_regterm(X_train, X_test, Y_train, Y_test, degrees = [20,30,40], alphas = np.logspace(-5,-1,5), method = "Lasso", nb=50, plot=True)
+    #Read data
+    data = imread('SRTM_data_Norway_1.tif') #All data
+    terrain = data[:50,-50:] #Subset
+    Y = terrain.ravel() #1d array of subset
+    dim = terrain.shape
+    x1,x2 = np.meshgrid(range(dim[0]), range(dim[1]))
+    X1 = x1.ravel().astype(np.float)
+    X2 = x2.ravel().astype(np.float)
+
+    #Create design matrix of 2D polynomials using X1 and X2
+    X = create_X(X1, X2, 50)
+
+    #Split into train and test set
+    X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size=0.2)
+
+    #Scale data
+    X_train, X_test = scale_data(X_train, X_test)
+    Y_train, Y_test = scale_data(Y_train, Y_test)
+
+
+    #BVT_OLS(X_train[:,:int(21*22/2)], X_test[:,:int(21*22/2)], Y_train, Y_test, nb=100, plot=True)
+    #BVT_Ridge(X_train, X_test, Y_train, Y_test, nb=20, plot=True)   
+    #BVT_DT(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb=100, plot=True)
+    #BVT_Lasso(X_train, X_test, Y_train, Y_test, nb=10, plot=True)
+    #BVT_NN(X_train[:,1:3], X_test[:,1:3], Y_train, Y_test, nb=10, plot=True)
+    #BVT_regterm(X_train, X_test, Y_train, Y_test, degrees = [20,30,40], alphas = np.logspace(-5,0,6), nb=10, plot=True)
+    #BVT_regterm(X_train, X_test, Y_train, Y_test, degrees = [20,30,40], alphas = np.logspace(-5,-1,5), method = "Lasso", nb=10, plot=True)
     
 
     labelsize = 21
