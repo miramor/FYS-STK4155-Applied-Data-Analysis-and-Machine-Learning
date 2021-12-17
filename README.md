@@ -81,7 +81,32 @@ Results for each paramter combination are printed to the terminal in latex-forma
 
 **How to use**:
 The following packages must be installed: sklearn, keras, pandas, numpy, matplotlib, os and seaborn.\
-Simpy write `NNGS.py` into the terminal.\
+Simpy write `NNGS.py` into the terminal.
 By default only Test 1 will be run. To run Test 2, change Test 2 = False to True.
 Similarly, change boolean for the respective test to run any one of the other tests.
 Some of the tests might take a while.
+
+### Decision tree, Random forest, Bagging, and Boosting
+
+**How to use**:
+The following packages must be installed: sklearn, pandas, numpy, matplotlib, and seaborn.\
+Simpy write `decision_tree_mm.py` into the terminal.\
+This will show first a plot of four different decision tree and random forrest methods as a function of the maximum depth. It will also show four heat maps for a grid search for random forest (Gini and entropy), bagging, and boosting.\
+Finaly it will show a confusion matrix for the best hyperparameters using the validation data and a confusion matrix with bagging for the test data.
+
+### Additional Exercise: Bias-Variance Tradeoff
+In the additional exercise we did a Bias-Variance Tradeoff analysis on terrain data from Norway.
+We looked at the trade of for three linear regression models (OLS, Ridge, Lasso), a feed forward neural network, and a decision tree.
+
+The code used is found in `terrain.py` and `functions.py`, whereas the first contains the
+code with computation and plotting, and functions contains some functions used.
+The data was obtained from https://earthexplorer.usgs.gov/, and it contains altitude of terrain. 
+`SRTM_data_Norway_1.tif` is the file containing the data.
+We looked at a small 50x50 area to reduce computation time.
+
+**How to use**:
+Two uncommon modules were used in this code. The `mlxtend` module for calculating variance, bias and loss,
+and `tqmd` for displaying progressbar in terminal during bootstrap.
+
+Running the file `terrain.py` will plot the surface the models are fitting.
+Unncomment the different functions `BVT_...` to see various bias-variance tradeoffs.

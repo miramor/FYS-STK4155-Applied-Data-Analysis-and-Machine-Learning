@@ -64,9 +64,9 @@ accuracy_rf_e = []
 depth = list(range(2,34,2))
 for i in depth:
     accuracy_dt_g.append(kfoldOwn(X_k, y_k, 5, DecisionTreeClassifier(random_state=0, max_depth = i)))
-    accuracy_rf_g.append(kfoldOwn(X_k, y_k, 5, RandomForestClassifier(random_state=0, max_depth = i)))
+    accuracy_rf_g.append(kfoldOwn(X_k, y_k, 5, RandomForestClassifier(n_estimators=160 ,random_state=0, max_depth = i)))
     accuracy_dt_e.append(kfoldOwn(X_k, y_k, 5, DecisionTreeClassifier(random_state=0, max_depth = i, criterion="entropy")))
-    accuracy_rf_e.append(kfoldOwn(X_k, y_k, 5, RandomForestClassifier(random_state=0, max_depth = i, criterion="entropy")))
+    accuracy_rf_e.append(kfoldOwn(X_k, y_k, 5, RandomForestClassifier(n_estimators=160 ,random_state=0, max_depth = i, criterion="entropy")))
 
 #Plot results
 plt.plot(depth, accuracy_dt_g, "o-", label="Decision tree (gini)")
@@ -83,6 +83,8 @@ plt.show()
 #Storing results
 accuracy_bagging = []
 accuracy_boosting = []
+accuracy_rf_g2 = []
+accuracy_rf_e2 = []
 
 #Loop through different number of estimators
 n_e = list(range(20,180,20))
@@ -91,16 +93,22 @@ for j in n_e:
     print(j)
     accuracy_bagging.append([])
     accuracy_boosting.append([])
+    accuracy_rf_g2.append([])
+    accuracy_rf_e2.append([])
     #Loop through different number of max depths
     for i in depth[:-2:2]:
         accuracy_bagging[k].append(kfoldOwn(X_k, y_k, 5, BaggingClassifier(n_estimators=j, random_state=0, base_estimator = DecisionTreeClassifier(max_depth=i))))
-        accuracy_boosting[k].append(kfoldOwn(X_k, y_k, 5, GradientBoostingClassifier(n_estimators=j, learning_rate=1.0, max_depth=i, random_state=0, criterion = "mse")))
+        accuracy_boosting[k].append(kfoldOwn(X_k, y_k, 5, GradientBoostingClassifier(n_estimators=j, learning_rate=1.0, max_depth=i, random_state=0, criterion = "friedman_mse")))
+        accuracy_rf_g2[k].append(kfoldOwn(X_k, y_k, 5, RandomForestClassifier(n_estimators=j, random_state=0, max_depth = i)))
+        accuracy_rf_e2[k].append(kfoldOwn(X_k, y_k, 5, RandomForestClassifier(n_estimators=j, random_state=0, max_depth = i, criterion="entropy")))
     k+=1
 
 
 #Make heatmaps
 make_heatmap(accuracy_bagging, depth[:-3:2], n_e, "bagging_hm.pdf", "Accuracy Bagging using K-Fold", "Depth", "Number of Estimators", save=True)
 make_heatmap(accuracy_boosting, depth[:-3:2], n_e, "boosting_hm.pdf", "Accuracy Boosting using K-Fold", "Depth", "Number of Estimators", save=True)
+make_heatmap(accuracy_rf_g2, depth[:-3:2], n_e, "rf_g_hm.pdf", "Accuracy random forest (Gini) using K-Fold", "Depth", "Number of Estimators", save=True)
+make_heatmap(accuracy_rf_e2, depth[:-3:2], n_e, "rf_e_hm.pdf", "Accuracy random forest (entropy) using K-Fold", "Depth", "Number of Estimators", save=True)
 
 
 
