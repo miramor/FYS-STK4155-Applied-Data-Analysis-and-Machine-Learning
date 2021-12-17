@@ -1,29 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import SGDRegressor
-from sklearn.linear_model import SGDClassifier
+from sklearn.linear_model import SGDRegressor, SGDClassifier, LinearRegression, Lasso, Ridge
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import pandas as pd
 from tqdm import tqdm
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from sklearn.linear_model import Lasso
 from sklearn import linear_model
 from imageio import imread
 from inspect import CO_VARARGS
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, Lasso, Ridge
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.neural_network import MLPRegressor
-from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVR
 from mlxtend.evaluate import bias_variance_decomp
+from sklearn.exceptions import ConvergenceWarning, DataConversionWarning
+import warnings
+warnings.filterwarnings(action="ignore", category=DeprecationWarning)
+warnings.filterwarnings(action='ignore', category=DataConversionWarning)
+warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 plt.style.use("seaborn")
 sns.set(font_scale=1.5)
