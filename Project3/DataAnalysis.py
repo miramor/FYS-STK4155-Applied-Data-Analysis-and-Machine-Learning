@@ -8,7 +8,6 @@ Data Analysis
 """
 
 plt.style.use("seaborn")
-#sns.set(font_scale=1.5)
 plt.rcParams["font.family"] = "Times New Roman"; plt.rcParams['axes.titlesize'] = 21; plt.rcParams['axes.labelsize'] = 21; plt.rcParams["xtick.labelsize"] = 21; plt.rcParams["ytick.labelsize"] = 21; plt.rcParams["legend.fontsize"] = 18
 
 
@@ -54,7 +53,6 @@ plt.show();
 #Histogram
 plt.clf()
 f, ax = plt.subplots(figsize=(18, 14))
-#f, ax = plt.subplots()
 df2.hist(ax=ax, xlabelsize=30, ylabelsize=30)
 plt.tight_layout()
 plt.savefig("potable_hist.pdf", dpi=400, bbox_inches='tight')
