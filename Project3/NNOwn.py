@@ -73,7 +73,7 @@ if Test1:
             dnn = MLPClassifier(hidden_layer_sizes=(n_neurons), activation='relu',solver="adam",
                                  alpha=lmd, batch_size= batch_size, learning_rate_init=eta, max_iter=epoch, random_state=1, momentum=0, early_stopping=False)
             test_accuracy[i][j] = kfoldOwn(X_k, y_k, 5, dnn)
-        print(f"{(i+1)/len(eta_vals)*100} % done")
+        print(f"{(i+1)/len(eta_vals)*100:.1f} % done")
 
     make_heatmap(test_accuracy, lmd_vals, eta_vals, ylabel = "Learning rate $\eta$", xlabel = "Regularization parameter $\lambda$", title = "Accuracy cross validation",with_precision = True, fn = "TA_LRL.pdf", save=True )
     #find optimal values
@@ -100,9 +100,8 @@ if Test2:
             dnn = MLPClassifier(hidden_layer_sizes=((10,)), activation='relu',solver="adam",
                                  alpha=optimal_lmd_test, batch_size= batch_size, learning_rate_init=eta, max_iter=epoch, random_state=1, momentum=0)
             test_accuracy[i][j] =  kfoldOwn(X_k, y_k, 5, dnn)
-        print(f"{(i+1)/len(eta_vals)*100} % done")
+        print(f"{(i+1)/len(eta_vals)*100:.1f} % done")
 
-    make_heatmap(test_accuracy, epoch_vals, eta_vals, ylabel = "Learning rate $\eta$", xlabel = "Epochs", title = "Accuracy score test set", fn = "TA_LRE.pdf", save=True, string=True )
     maxAcc_test_index = np.argwhere(test_accuracy == np.max(test_accuracy))[0]
     optimal_eta_test = eta_vals[maxAcc_test_index[0]]
     optimal_epoch_test = epoch_vals[maxAcc_test_index[1]]
@@ -137,7 +136,7 @@ if Test3:
             dnn = MLPClassifier(hidden_layer_sizes=n_neuron, activation=acfunc,solver="adam",
                                 alpha=optimal_lmd_test, batch_size= batch_size, learning_rate_init=optimal_eta_test, max_iter=optimal_epoch_test, random_state=1, momentum = 0)
             test_accuracy[i][j] =  kfoldOwn(X_k, y_k, 5, dnn)
-        print(f"{(i+1)/len(n_hidden_neurons)*100} % done")
+        print(f"{(i+1)/len(n_hidden_neurons)*100:.1f} % done")
 
     #make_heatmap(test_accuracy, np.arange(len(activFunc)),np.arange(len(n_hidden_neurons)) , xlabel = "Activation function", ylabel = "Neurons", title = "Accuracy score cross validation", fn = "TA_NAcf.pdf", save=True )
     make_heatmap(test_accuracy, activFunc,n_hidden_neurons , xlabel = "Activation function", ylabel = "Neurons", title = "Accuracy score cross validation", fn = "TA_NAcf.pdf", save=True,string=True )
@@ -152,7 +151,6 @@ if Test3:
 
 #optimal_eta_test = 0.1
 #optimal_hneurons = (10,)
-
 
 #Test running over epochs and batch size for different solvers (adam, sgd with and without momentum)
 if Test4:
@@ -179,12 +177,12 @@ if Test4:
             test_accuracySGDM2[i][j] =  kfoldOwn(X_k, y_k, 5, dnnSGDM2)
             test_accuracySGD[i][j] =  kfoldOwn(X_k, y_k, 5, dnnSGD)
             test_accuracySGDM[i][j] =  kfoldOwn(X_k, y_k, 5, dnnSGDM)
-        print(f"{(i+1)/len(epoch_vals)*100} % done")
+        print(f"{(i+1)/len(epoch_vals)*100:.1f} % done")
     optimal_epoch = []
     optimal_batch = []
     maxAcc_t_index = []
     for test in [test_accuracyA, test_accuracySGDM2, test_accuracySGD, test_accuracySGDM]:
-        print(np.max(test))
+        #print(np.max(test))
         maxAcc_test_index = np.argwhere(test == np.max(test))[0]
         maxAcc_t_index.append(maxAcc_test_index)
         optimal_epoch.append(epoch_vals[maxAcc_test_index[0]])
@@ -213,8 +211,7 @@ if Test4:
 clf = MLPClassifier(hidden_layer_sizes=optimal_hneurons, activation="relu",solver="adam",
                     alpha=optimal_lmd_test, batch_size= 50, learning_rate_init=optimal_eta_test,  max_iter=optimal_epoch_test, momentum=0, random_state=1).fit(X_train, y_train)
 y_pred = clf.predict(X_val)
+print("Results with validation data")
 make_confusion_matrix(y_val, y_pred, fn="ConfusionMatrixOwn.pdf", save=True)
-print(classification_report(y_val,y_pred))
-print(accuracy_score(y_val, y_pred))
-
-
+print(classification_report(y_val,y_pred, digits=3))
+print("Accuracy score", accuracy_score(y_val, y_pred))

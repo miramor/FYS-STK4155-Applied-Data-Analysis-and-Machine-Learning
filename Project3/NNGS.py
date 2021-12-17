@@ -88,6 +88,11 @@ params3 = {'activation': ['relu'],
          }
 
 def algorithm_pipeline(X_train, X_val, y_train, model, params_, cv=5, search_mode="GridSearchSV", n_iterations = 0, scoring_fit="accuracy" ):
+    """
+    Function for performing gridsearch either with GridSearchSV or RandomizedSearchCV running search in parallell
+    Fitting model with combination of training and validation data
+    Returning model with grid search results and prediction with validation data
+    """
     if search_mode =="GridSearchSV":
         gs = GridSearchCV(estimator=model, param_grid=params_, cv = cv, n_jobs=-1, scoring=scoring_fit, verbose=2)
     elif search_mode == "RandomizedSearchCV":
@@ -118,15 +123,15 @@ Test6 = False
 if Test1:
     print("Test 1")
     optimizer = ['SGD', 'RMSprop', 'Adagrad', 'Adam']
-    param_grid = dict(optimizer=optimizer)
-    def create_model(optimizer):#learn_rate= 0.01, momentum = 0, dropout_rate=0.0):#, init_mode='uniform'):
+    param_grid = dict(optimizer=optimizer) #hyper-parameters
+    def create_model(optimizer): #create architecture of network
         opt = {'SGD': SGD(lr=0.1, momentum=0.3, nesterov=True), 'RMSprop': RMSprop(lr=0.1), 'Adagrad':Adagrad(lr=0.1), 'Adam':Adam(lr=0.1)}
         model = Sequential()
-        model.add(Dense(10, input_dim=9, activation='relu', kernel_regularizer= l2(0.000237)))
-        model.add(Dense(1, activation='sigmoid'))
+        model.add(Dense(10, input_dim=9, activation='relu', kernel_regularizer= l2(0.000237))) #hidden layer with 10 neurons, relu as activation adding l2 norm
+        model.add(Dense(1, activation='sigmoid')) #outputlayer with one neuron and sigmoid as activation
         model.compile(loss='binary_crossentropy', optimizer=opt[optimizer], metrics=['accuracy'])
         return model
-    model_ks = KerasClassifier(build_fn=create_model,epochs=150, batch_size=50, verbose=0)
+    model_ks = KerasClassifier(build_fn=create_model,epochs=150, batch_size=50, verbose=0) #create network
     model_ks, pred = algorithm_pipeline(X_k, X_val, y_k, model_ks, param_grid, cv=5, scoring_fit="accuracy")
     Perform(model_ks)
 
@@ -136,11 +141,10 @@ if Test2:
     learn_rate = [0.001, 0.01, 0.1]
     epochs = [10, 50, 100, 150, 200]
     param_grid = dict(learn_rate=learn_rate,epochs=epochs)
-    def create_model(learn_rate=0.01, beta_1=0.8, beta_2=0.99):#learn_rate= 0.01, momentum = 0, dropout_rate=0.0):#, init_mode='uniform'):
+    def create_model(learn_rate=0.01, beta_1=0.8, beta_2=0.99):
         model = Sequential()
         model.add(Dense(10, input_dim=9, activation='relu',kernel_regularizer= l2(0.000237)))
         model.add(Dense(1, activation='sigmoid'))
-        #optimizer = Adam(lr=learn_rate, beta_1=0.9, beta_2=0.999)
         optimizer = Adagrad(lr=learn_rate)
         model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
         return model
@@ -154,7 +158,7 @@ if Test3:
     print("Test 3")
     init_mode = ['uniform', 'lecun_uniform', 'normal', 'zero', 'glorot_normal', 'glorot_uniform', 'he_normal', 'he_uniform']
     param_grid = dict(init_mode=init_mode)
-    def create_model(init_mode="uniform"):#learn_rate= 0.01, momentum = 0, dropout_rate=0.0):#, init_mode='uniform'):
+    def create_model(init_mode="uniform"):
         model = Sequential()
         model.add(Dense(10, input_dim=9, kernel_initializer=init_mode,activation='relu',kernel_regularizer= l2(0.000237)))
         model.add(Dense(1, kernel_initializer=init_mode,activation='sigmoid'))
@@ -173,7 +177,7 @@ if Test4:
     activation = ['softmax', 'relu', 'tanh', 'sigmoid', 'linear']
     param_grid = dict(activation=activation)
 
-    def create_model(activation="relu"):#learn_rate= 0.01, momentum = 0, dropout_rate=0.0):#, init_mode='uniform'):
+    def create_model(activation="relu"):
         model = Sequential()
         model.add(Dense(12, input_dim=9, kernel_initializer='uniform',activation=activation,kernel_regularizer= l2(0.000237)))
         model.add(Dense(1, kernel_initializer='uniform',activation='sigmoid'))
@@ -192,7 +196,7 @@ if Test5:
     weight_constraint = [1, 2, 3, 4, 5]
     dropout_rate = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     param_grid = dict(dropout_rate=dropout_rate, weight_constraint=weight_constraint)
-    def create_model(dropout_rate=0.0, weight_constraint=0):#learn_rate= 0.01, momentum = 0, dropout_rate=0.0):#, init_mode='uniform'):
+    def create_model(dropout_rate=0.0, weight_constraint=0):
         model = Sequential()
         model.add(Dense(12, input_dim=9, kernel_initializer='uniform',activation='relu', kernel_constraint=maxnorm(weight_constraint),kernel_regularizer= l2(0.000237)))
         model.add(Dropout(dropout_rate))
@@ -213,7 +217,7 @@ if Test6:
     epochs = [10,50,100,150]
     batch_size = [10, 20, 40, 60, 80]
     param_grid = dict(neurons=neurons, batch_size=batch_size, epochs=epochs)
-    def create_model(neurons=1):#learn_rate= 0.01, momentum = 0, dropout_rate=0.0):#, init_mode='uniform'):
+    def create_model(neurons=1):
         model = Sequential()
         model.add(Dense(neurons, input_dim=9, kernel_initializer='uniform',activation='relu', kernel_constraint=maxnorm(2)))
         model.add(Dropout(0.1))

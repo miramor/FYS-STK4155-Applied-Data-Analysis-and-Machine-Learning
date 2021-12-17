@@ -2,8 +2,8 @@
 
 ## Projects
 ### Project 1: Regression Analysis and Resampling Methods
-In this project we run Ordinary Least Squares, Ridge Regression and Lasso Regression on the Franke Function and Terrain Data. 
-We have one file "functions.py" containing all the functions used in this project. We also have a separate file for each exercise. These are named "ex1.py", "ex2.py" etc.. 
+In this project we run Ordinary Least Squares, Ridge Regression and Lasso Regression on the Franke Function and Terrain Data.
+We have one file "functions.py" containing all the functions used in this project. We also have a separate file for each exercise. These are named "ex1.py", "ex2.py" etc..
 The folder UploadedFigures contains all the plots created when running the exercises.
 
 **How to use:**
@@ -11,7 +11,7 @@ By simply running the files for each exercise, all of the results in our report 
 
 ### Project 2: Classification and Regression, from Linear and Logistic Regression to Neural Networks
 In this project we have made our own implementation of stochastic gradient descent (SGD), feed forward neural network and logsitic reggresion, both of which use SGD.
-We have one file "functions.py" containing a handful of the functions used in this project. 
+We have one file "functions.py" containing a handful of the functions used in this project.
 There is a seperate file for most of the exercises. There are two classes for the neural network code,
 one for regression and one for classification.
 
@@ -48,7 +48,7 @@ Running `DataAnalysis.py` will show a pie chart of the potable water distributio
 
 ### Feed Forward Neural Network
 #### Self-implemented Gridsearch
-In NNOwn.py, a self-implemented grid search is performed using MLPClassifier. 
+In NNOwn.py, a self-implemented grid search is performed using MLPClassifier.
 For each test, the mean accuracy is calculated using stratified kfold with k=5 folds and the results are displayed either in a heatmap or a simple graph.
 The tests can be run consecutively, using the optimal parameters from the previous searches.\
 Test 1: Run over learning rate and regularization parameters\
@@ -58,9 +58,9 @@ Test 4: Run over epochs and batch size for different solvers
 
 Finally, a prediction of the validation-accuracy is performed using the MLPClassifier with optimized parameters.
 A confusion matrix and metric scores are also shown.
-For plotting, some functions are imported from `functions1.py`. 
+For plotting, some functions are imported from `functions1.py`.
 
-**How to use**: 
+**How to use**:
 The following packages must be installed: sklearn, pandas, numpy, matplotlib and seaborn.\
 Simple write `NNOwn.py` into the terminal.\
 By default all test will be run.
@@ -79,11 +79,9 @@ Test 6: Running over neurons, epochs and batch size
 
 Results for each paramter combination are printed to the terminal in latex-format.
 
-**How to use**: 
+**How to use**:
 The following packages must be installed: sklearn, keras, pandas, numpy, matplotlib, os and seaborn.\
 Simpy write `NNGS.py` into the terminal.\
 By default only Test 1 will be run. To run Test 2, change Test 2 = False to True.
 Similarly, change boolean for the respective test to run any one of the other tests.
-The gridsearch can take some time.
-
-
+Some of the tests might take a while.

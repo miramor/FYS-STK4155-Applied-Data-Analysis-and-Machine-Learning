@@ -71,7 +71,7 @@ def Performance(model, X_train, y_train, X_val, y_val):
 
 def kfoldOwn(X,y,k,model):
     """
-    Performing StratifiedKFold for MLPClassifier calculating mean accuracy of the k folds
+    Performing StratifiedKFold for a given model calculating mean accuracy of the k folds
     """
     accuracy = 0
     kfold = StratifiedKFold(n_splits=k, shuffle=True, random_state= 7)
