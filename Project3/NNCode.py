@@ -154,7 +154,7 @@ actfunc = {
     "relu": relu,
     "leaky_relu": leaky_relu
 }
-af = "relu"
+af = "sigmoid"
 
 for i,eta_ in enumerate(eta):
     for j,n_  in enumerate(n_neurons):
