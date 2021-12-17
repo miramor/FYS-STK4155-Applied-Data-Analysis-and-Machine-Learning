@@ -105,5 +105,8 @@ The data was obtained from https://earthexplorer.usgs.gov/, and it contains alti
 We looked at a small 50x50 area to reduce computation time.
 
 **How to use**:
+Two uncommon modules were used in this code. The "mlxtend" module for calculating variance, bias and loss,
+and "tqmd" for displaying progressbar in terminal during bootstrap.
+
 Running the file "terrain.py" will plot the surface the models are fitting.
 Unncomment the different functions "BVT_\*\*\*" to see various bias-variance tradeoffs.
