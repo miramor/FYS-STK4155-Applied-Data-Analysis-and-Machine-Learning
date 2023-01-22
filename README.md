@@ -4,7 +4,7 @@ Repository of collaborative coursework for FYS-STK4155 Applied Data Analysis and
 
 ## Projects
 ### [Project 1](https://github.com/miramor/FYS-STK4155-Applied-Data-Analysis-and-Machine-Learning/tree/main/Project1): Regression Analysis and Resampling Methods
-In this project we run Ordinary Least Squares, Ridge Regression and Lasso Regression on the Franke Function and Terrain Data.
+In this project we run ordinary least squares, ridge regression and lasso regression on the Franke function and terrain data.
 
 ### [Project 2](https://github.com/miramor/FYS-STK4155-Applied-Data-Analysis-and-Machine-Learning/tree/main/Project2): Classification and Regression, from Linear and Logistic Regression to Neural Networks
 In this project we have made our own implementation of stochastic gradient descent (SGD), feed forward neural network and logsitic reggresion, both of which use SGD.
