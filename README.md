@@ -12,5 +12,5 @@ In this project we have made our own implementation of stochastic gradient desce
 ### [Project 3](https://github.com/miramor/FYS-STK4155-Applied-Data-Analysis-and-Machine-Learning/tree/main/Project3): Water Quality Predicition
 In this project we predict the water-potabilty given a binary classification dataset. The predictions are done by implementing a feed forward neural network, decision tree, decision tree with bagging, boosting and random forest.
 
-#### Extra
-Bias-Variance Tradeoff analysis on terrain data from Norway
+#### [Extra Project](https://github.com/miramor/FYS-STK4155-Applied-Data-Analysis-and-Machine-Learning/tree/main/ExtraProject): Bias-Variance Tradeoff Analysis 
+Conducting a bias-variance tradeoff analysis on terrain data from Norway
