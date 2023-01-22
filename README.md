@@ -1,5 +1,5 @@
 # FYS-STK4155 Applied Data Analysis and Machine Learning.  
-Repository of collaborative coursework for FYS-STK4155 Applied Data Analysis and Machine Learning at the University of Oslo. The course covers central algorithms and methods essential for studies of statistical data analysis and machine learning. There are a total of three projects, which are outlined below. Each project folder contains the source code and a report.
+Repository of collaborative coursework for FYS-STK4155 Applied Data Analysis and Machine Learning at the University of Oslo. The course covers central algorithms and methods essential for studies of statistical data analysis and machine learning. There are a total of three main projects, which are outlined below. Each project folder contains the source code and a report.
 
 
 ## Projects
