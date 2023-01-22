@@ -15,7 +15,7 @@ Exercise 1:
 Running ordinary least squares on the Franke Function printing MSE and R2 for train and test data respectively.
 
 Exercise 2:
-Running OLS on the Franke Function as a function of the complexity of the model and using bootstrap as the resampling method. \
+Running OLS on the Franke Function as a function of the complexity of the model and using bootstrap as the resampling method. 
 Running OLS on the Franke Function for a given complexity and as a function of the size of the data set (number of datapoints).
 
 Exercise 3:
