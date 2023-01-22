@@ -5,34 +5,28 @@ The folder UploadedFigures contains all the plots created when running the exerc
 
 **How to use:**
 By simply running the files for each exercise, all of the results in our report are reproduced.
-Example 
+For example type 
 ```python
 ex1.py
 ```
+A summary for each exercise-file is given below. A more comprehensive explanations is given in the report.
+
 Exercise 1:
-Running ordinary least squares on the Franke Function printing MSE and R2 for train and test data respectively
-Plotting confidence intervals for beta values
+Running ordinary least squares on the Franke Function printing MSE and R2 for train and test data respectively.
 
 Exercise 2:
-Running OLS on the Franke Function as a function of the complexity of the model and using bootstrap as the resampling method
--->Plot mean MSE as function of complexity
-Running OLS on the Franke Function for a given complexity and as a function of the size of the data set (number of datapoints)
--->Plot mean MSE as a function of datapoints
+Running OLS on the Franke Function as a function of the complexity of the model and using bootstrap as the resampling method. \
+Running OLS on the Franke Function for a given complexity and as a function of the size of the data set (number of datapoints).
 
 Exercise 3:
-Running OLS on the Franke Function as a function of the complexity of the model and using k-fold as a resampling technique
--->Plotting mean MSE as a function of complexity
+Running OLS on the Franke Function as a function of the complexity of the model and using k-fold as a resampling technique.
 
 Exercise 4:
-Running Ridge on the Franke Function for different lambdas as a function of the complexty of the model
--->Plotting MSE as a function of lambdas
-For best lambda value, plot mean MSE (using bootstrap) as a function of complexity
+Running Ridge on the Franke Function for different lambdas as a function of the complexty of the model.
 
 Exercise 5:
-Running Lasso regression on the Franke functionfor for different lambdas as a function of complexity of the model
--->Plotting MSE as a function of lambdas
-For best lambda, plot mean MSE (using bootstrap) as a function of complexity
+Running Lasso regression on the Franke functionfor for different lambdas as a function of complexity of the model.
 
 Exercise 6:
-Running OLS, Ridge and Lasso on real terrain data
-Finding mean MSE using bootstrap
+Running OLS, Ridge and Lasso on real terrain data.
+Finding mean MSE using bootstrap.
