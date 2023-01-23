@@ -5,28 +5,39 @@ The folder UploadedFigures contains all the plots created when running the exerc
 
 **How to use:**
 By simply running the files for each exercise, all of the results in our report are reproduced.
-For example type 
+For example type the following in a Linux/Unix command line
 ```python
-ex1.py
+python3 ex1.py
 ```
 A summary for each exercise-file is given below. A more comprehensive explanations is given in the report.
 
 Exercise 1:
-Running ordinary least squares on the Franke Function printing MSE and R2 for train and test data respectively.
+Running ordinary least squares on the Franke Function printing MSE and R2 for train and test data respectively.\
+Dependencies: sklearn, random, numpy and importlib
 
 Exercise 2:
 Running OLS on the Franke Function as a function of the complexity of the model and using bootstrap as the resampling method. 
-Running OLS on the Franke Function for a given complexity and as a function of the size of the data set (number of datapoints).
+Running OLS on the Franke Function for a given complexity and as a function of the size of the data set (number of datapoints).\
+Dependencies: sklearn, random, numpy and importlib
 
 Exercise 3:
-Running OLS on the Franke Function as a function of the complexity of the model and using k-fold as a resampling technique.
+Running OLS on the Franke Function as a function of the complexity of the model and using k-fold as a resampling technique.\
+Dependencies: sklearn, random, numpy and importlib
 
 Exercise 4:
-Running Ridge on the Franke Function for different lambdas as a function of the complexty of the model.
+Running Ridge on the Franke Function for different lambdas as a function of the complexty of the model.\
+Dependencies: sklearn, random, numpy and importlib
 
 Exercise 5:
-Running Lasso regression on the Franke functionfor for different lambdas as a function of complexity of the model.
+Running Lasso regression on the Franke functionfor for different lambdas as a function of complexity of the model.\
+Dependencies: sklearn, random, numpy and importlib
 
 Exercise 6:
 Running OLS, Ridge and Lasso on real terrain data.
-Finding mean MSE using bootstrap.
+Finding mean MSE using bootstrap.\
+Dependencies: sklearn, random, numpy, imageio, matplotlib and importlib
+
+Extra function:
+`functions.py`contains functions needed for exercise 1 to 6\
+Dependencies: sklearn, random, numpy, matplotlib, imageio and importlib
+

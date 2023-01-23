@@ -7,8 +7,12 @@ There are a total of 3276 samples in this set, but 1265 of these samples have at
 We have, for this project, decided to just remove these values since we will still have a total of 2011 samples.
 Predictions are done using a feed forward neural network, decision trees and random forest with bagging and boosting.
 
-**How to use**: Download the dataset here: [Water-Potability](https://www.kaggle.com/adityakadiwal/water-potability).  
-Running `DataAnalysis.py` will show a pie chart of the potable water distribution, a histogram, a correlation matrix and three box plots for the nine features.
+**How to use**: Download the dataset here: [Water-Potability](https://www.kaggle.com/adityakadiwal/water-potability). The following packages must be installed: sklearn, pandas, numpy, matplotlib and seaborn.
+Running the following in a Linux/Unix command line
+```python
+python3 DataAnalysis.py
+```
+will show a pie chart of the potable water distribution, a histogram, a correlation matrix and three box plots for the nine features.
 
 ### Feed Forward Neural Network
 #### Self-implemented Gridsearch
@@ -26,14 +30,14 @@ For plotting, some functions are imported from `functions1.py`.
 
 **How to use**:
 The following packages must be installed: sklearn, pandas, numpy, matplotlib and seaborn.\
-Simple write 
+Simply write the following in a Linux/Unix command line
 ```python
-NNOwn.py
+python3 NNOwn.py
 ```
 By default all test will be run.
 
 #### Scikit-learn's Gridsearch
-In NNGS.py, sklearn's grid search is used, utilizing either MLPClassifier or KerasClassifer.
+In `NNGS.py`, sklearn's grid search is used, utilizing either MLPClassifier or KerasClassifer.
 Again, the mean accuracy is computed using cross validation with k=5 folds.
 The gridsearch using MLP Classifier examines optimized exponential decay rates for the adam solver.
 The gridsearch using the KerasClassifier consists in total of six test. The test can be run independently.\
@@ -48,9 +52,9 @@ Results for each paramter combination are printed to the terminal in latex-forma
 
 **How to use**:
 The following packages must be installed: sklearn, keras, pandas, numpy, matplotlib, os and seaborn.\
-Simpy write 
+Simpy write the following in a Linux/Unix command line
 ```python
-NNGS.py
+python3 NNGS.py
 ```
 By default only Test 1 will be run. To run Test 2, change Test 2 = False to True.
 Similarly, change boolean for the respective test to run any one of the other tests.
@@ -60,9 +64,9 @@ Some of the tests might take a while.
 
 **How to use**:
 The following packages must be installed: sklearn, pandas, numpy, matplotlib, and seaborn.\
-Simpy write 
+Simpy write the following in a Linux/Unix command line
 ```python
-decision_tree_mm.py
+python3 decision_tree_mm.py
 ```
 This will show first a plot of four different decision tree and random forrest methods as a function of the maximum depth. It will also show four heat maps for a grid search for random forest (Gini and entropy), bagging, and boosting.\
 Finaly it will show a confusion matrix for the best hyperparameters using the validation data and a confusion matrix with bagging for the test data.
