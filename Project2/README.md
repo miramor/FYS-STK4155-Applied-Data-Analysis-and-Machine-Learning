@@ -16,7 +16,7 @@ A summary for each file is given below.
 #### Stochastic gradient descent for predicting values of the Franke function
 
 Running `a_sgd.py` will show results from three grid searches. One with OLS cost function and varying learning rate and number of mini batches. Two with ridge cost function, varying first learning rate and number of mini batches, and then learning rate and normalization parameter. Some results using SKlearn's SGD are printed as well. \
-Dependencies: sys, sklearn, random, numpy, matplotlib and importlib
+Dependencies: sklearn, random, numpy, matplotlib and importlib
 
 #### Neural Network
 

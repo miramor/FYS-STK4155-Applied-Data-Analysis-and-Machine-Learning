@@ -9,7 +9,7 @@ For example type the following in a Linux/Unix command line
 ```python
 python3 ex1.py
 ```
-A summary for each exercise-file is given below. A more comprehensive explanations is given in the report.
+A summary for each exercise-file is given below. A more comprehensive explanation is given in the report.
 
 Exercise 1:
 Running ordinary least squares on the Franke Function printing MSE and R2 for train and test data respectively.\
@@ -37,7 +37,7 @@ Running OLS, Ridge and Lasso on real terrain data.
 Finding mean MSE using bootstrap.\
 Dependencies: sklearn, random, numpy, imageio, matplotlib and importlib
 
-Extra function:
+Supplementary functions:
 `functions.py`contains functions needed for exercise 1 to 6\
 Dependencies: sklearn, random, numpy, matplotlib, imageio and importlib
 
