@@ -14,7 +14,7 @@ and `tqmd` for displaying progressbar in terminal during bootstrap.
 
 Running the file 
 ```python
-terrain.py
+python3 terrain.py
 ```
 will plot the surface the models are fitting.
 Unncomment the different functions "BVT_..." to see various bias-variance tradeoffs.
